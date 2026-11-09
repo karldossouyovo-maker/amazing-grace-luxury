@@ -58,10 +58,41 @@
       <p class="kick">Book Diamant</p>
       <p class="pr">145 000 FCFA <small>/ night</small></p>
       <div class="g2"><div class="fld"><label for="rb-in">Check-in</label><input type="date" id="rb-in" name="arrivee" required></div><div class="fld"><label for="rb-out">Check-out</label><input type="date" id="rb-out" name="depart" required></div></div>
-      <button class="btn" type="submit">Book this room</button>
+      <div class="g2"><div class="fld"><label for="rb-ad">Adults</label><select id="rb-ad" name="adultes"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div><div class="fld"><label for="rb-en">Children</label><select id="rb-en" name="enfants"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div></div>
+      <p class="rb-msg" id="rb-msg" role="alert"></p>
+      <button class="btn" type="submit">Continue my booking</button>
       <p class="note">Availability shown instantly, confirmed on the spot. Your stay is paid at reception.</p>
       <a class="giftlnk" href="cadeaux-en.html?chambre=diamant">🎁 Give nights in this room</a>
       <a class="wa" href="https://wa.me/2290148841111?text=Hello%2C%20I%20am%20interested%20in%20the%20room%20Diamant." target="_blank" rel="noopener"><svg width="20" height="20" style="color:#1f8f4e" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>A question about this room?</a>
+    </form>
+  </div>
+</div></section>
+<section class="rconf" id="confirmer" hidden><div class="wrap">
+  <div class="sec-top"><div class="h"><p class="kick">Final step</p><h2>Confirm <em>your stay</em></h2></div></div>
+  <div class="rcf-grid">
+    <aside class="rcf-sum">
+      <img src="assets/img/p-diamant-salon.webp" alt="">
+      <div class="b"><p class="kick">Suite</p><h3>Diamant</h3>
+      <div class="row"><span>Dates</span><span id="cf-dates"></span></div>
+      <div class="row"><span>Length</span><span id="cf-n"></span></div>
+      <div class="row"><span>Guests</span><span id="cf-g"></span></div>
+      <div class="row"><span>Price per night</span><span id="cf-rate"></span></div>
+      <div class="row"><span>Breakfast</span><span>Included</span></div>
+      <div class="row"><span>Options</span><span id="cf-opts">—</span></div>
+      <div class="tot"><span>Total</span><b id="cf-tot"></b></div>
+      <a class="lnk" href="#rbook" id="cf-edit">Change dates</a></div>
+    </aside>
+    <form class="avl-f" id="cf-f" novalidate>
+      <h3>Your details</h3>
+      <div class="g2"><div class="fld"><label for="cf-nm">Full name</label><input id="cf-nm" name="nom" autocomplete="name" required></div>
+      <div class="fld"><label for="cf-tel">Phone / WhatsApp</label><input id="cf-tel" name="tel" type="tel" autocomplete="tel" required></div></div>
+      <div class="fld"><label for="cf-em">Email</label><input id="cf-em" name="email" type="email" autocomplete="email" required></div>
+      <h3>Your options</h3>
+      <div class="opts"><div class="optx"><label class="opt"><input type="checkbox" name="navette" value="Yes" data-opt="Airport shuttle" data-reveal="cdiamant-navx"><span><b>Airport shuttle</b><small>A driver meets you on arrival.</small></span></label><div class="optsub" id="cdiamant-navx" hidden><div class="fld"><label for="cdiamant-veh">Preferred vehicle</label><select id="cdiamant-veh" name="vehicule"><option>Comfort sedan · 1 to 3 people</option><option>SUV / 4×4 · 1 to 4 people</option><option>Minivan · up to 7 people</option></select></div><div class="fld"><label for="cdiamant-vol">Flight or arrival time</label><input id="cdiamant-vol" name="vol" placeholder="e.g. AF 0820, 10:30 pm"></div></div></div><div class="optx"><label class="opt"><input type="checkbox" name="tardif" value="Yes" data-opt="Late check-out" data-reveal="cdiamant-latex"><span><b>Late check-out</b><small>Extra charge: reception gives you the rate.</small></span></label><div class="optsub" id="cdiamant-latex" hidden><div class="fld"><label for="cdiamant-hr">Preferred check-out time</label><select id="cdiamant-hr" name="heure"><option>1 pm</option><option>2 pm</option><option>3 pm</option><option>4 pm</option><option>5 pm</option><option>6 pm</option><option>Until my evening flight</option></select></div></div></div><label class="opt"><input type="checkbox" data-xopt="Driver for the day"><span><b>Driver for the day</b><small>Family visits, Ouidah, Ganvié… on request.</small></span></label><label class="opt"><input type="checkbox" data-xopt="Baby cot"><span><b>Baby cot</b><small>Ready before you arrive.</small></span></label><label class="opt"><input type="checkbox" data-xopt="Special occasion"><span><b>Special occasion</b><small>Birthday, honeymoon: let us know.</small></span></label></div>
+      <div class="fld"><label for="cf-msg">A special request? (optional)</label><textarea id="cf-msg" name="msg" rows="2"></textarea></div>
+      <label class="avl-ok"><input type="checkbox" name="cgv" required> I accept the&nbsp;<a href="conditions-en.html" target="_blank">booking terms</a>. The stay is paid at reception (Mobile Money, card, cash).</label>
+      <p class="avl-err" id="cf-err" role="alert"></p>
+      <button class="btn" type="submit" id="cf-go">Confirm my booking</button>
     </form>
   </div>
 </div></section>

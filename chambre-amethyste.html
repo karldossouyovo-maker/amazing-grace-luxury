@@ -58,10 +58,41 @@
       <p class="kick">Réserver Améthyste</p>
       <p class="pr">Sur demande</p>
       <div class="g2"><div class="fld"><label for="rb-in">Arrivée</label><input type="date" id="rb-in" name="arrivee" required></div><div class="fld"><label for="rb-out">Départ</label><input type="date" id="rb-out" name="depart" required></div></div>
-      <button class="btn" type="submit">Je réserve cette chambre</button>
+      <div class="g2"><div class="fld"><label for="rb-ad">Adultes</label><select id="rb-ad" name="adultes"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div><div class="fld"><label for="rb-en">Enfants</label><select id="rb-en" name="enfants"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div></div>
+      <p class="rb-msg" id="rb-msg" role="alert"></p>
+      <button class="btn" type="submit">Continuer ma réservation</button>
       <p class="note">Disponibilité affichée immédiatement, confirmation sur-le-champ. Le séjour se règle à la réception.</p>
       <a class="giftlnk" href="cadeaux.html?chambre=amethyste">🎁 Offrir des nuits dans cette chambre</a>
       <a class="wa" href="https://wa.me/2290148841111?text=Bonjour%2C%20je%20suis%20int%C3%A9ress%C3%A9%28e%29%20par%20la%20chambre%20Am%C3%A9thyste." target="_blank" rel="noopener"><svg width="20" height="20" style="color:#1f8f4e" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Une question sur cette chambre ?</a>
+    </form>
+  </div>
+</div></section>
+<section class="rconf" id="confirmer" hidden><div class="wrap">
+  <div class="sec-top"><div class="h"><p class="kick">Dernière étape</p><h2>Confirmez <em>votre séjour</em></h2></div></div>
+  <div class="rcf-grid">
+    <aside class="rcf-sum">
+      <img src="assets/img/hd-amethyste.webp" alt="">
+      <div class="b"><p class="kick">Côté jardin</p><h3>Améthyste</h3>
+      <div class="row"><span>Dates</span><span id="cf-dates"></span></div>
+      <div class="row"><span>Durée</span><span id="cf-n"></span></div>
+      <div class="row"><span>Voyageurs</span><span id="cf-g"></span></div>
+      <div class="row"><span>Prix par nuit</span><span id="cf-rate"></span></div>
+      <div class="row"><span>Petit-déjeuner</span><span>Inclus</span></div>
+      <div class="row"><span>Options</span><span id="cf-opts">—</span></div>
+      <div class="tot"><span>Total</span><b id="cf-tot"></b></div>
+      <a class="lnk" href="#rbook" id="cf-edit">Modifier les dates</a></div>
+    </aside>
+    <form class="avl-f" id="cf-f" novalidate>
+      <h3>Vos coordonnées</h3>
+      <div class="g2"><div class="fld"><label for="cf-nm">Nom et prénom</label><input id="cf-nm" name="nom" autocomplete="name" required></div>
+      <div class="fld"><label for="cf-tel">Téléphone / WhatsApp</label><input id="cf-tel" name="tel" type="tel" autocomplete="tel" required></div></div>
+      <div class="fld"><label for="cf-em">Email</label><input id="cf-em" name="email" type="email" autocomplete="email" required></div>
+      <h3>Vos options</h3>
+      <div class="opts"><div class="optx"><label class="opt"><input type="checkbox" name="navette" value="Oui" data-opt="Navette aéroport" data-reveal="camethyste-navx"><span><b>Navette aéroport</b><small>Un chauffeur vous attend à votre arrivée.</small></span></label><div class="optsub" id="camethyste-navx" hidden><div class="fld"><label for="camethyste-veh">Véhicule souhaité</label><select id="camethyste-veh" name="vehicule"><option>Berline confort · 1 à 3 personnes</option><option>SUV / 4×4 · 1 à 4 personnes</option><option>Minivan · jusqu’à 7 personnes</option></select></div><div class="fld"><label for="camethyste-vol">Vol ou heure d’arrivée</label><input id="camethyste-vol" name="vol" placeholder="Ex. AF 0820, 22 h 30"></div></div></div><div class="optx"><label class="opt"><input type="checkbox" name="tardif" value="Oui" data-opt="Départ tardif" data-reveal="camethyste-latex"><span><b>Départ tardif</b><small>En supplément : la réception vous indique le tarif.</small></span></label><div class="optsub" id="camethyste-latex" hidden><div class="fld"><label for="camethyste-hr">Heure de départ souhaitée</label><select id="camethyste-hr" name="heure"><option>13 h</option><option>14 h</option><option>15 h</option><option>16 h</option><option>17 h</option><option>18 h</option><option>Jusqu’à mon vol du soir</option></select></div></div></div><label class="opt"><input type="checkbox" data-xopt="Chauffeur à la journée"><span><b>Chauffeur à la journée</b><small>Visites de famille, Ouidah, Ganvié… sur demande.</small></span></label><label class="opt"><input type="checkbox" data-xopt="Lit bébé"><span><b>Lit bébé</b><small>Préparé avant votre arrivée.</small></span></label><label class="opt"><input type="checkbox" data-xopt="Occasion spéciale"><span><b>Occasion spéciale</b><small>Anniversaire, lune de miel : dites-le-nous.</small></span></label></div>
+      <div class="fld"><label for="cf-msg">Une demande particulière ? (facultatif)</label><textarea id="cf-msg" name="msg" rows="2"></textarea></div>
+      <label class="avl-ok"><input type="checkbox" name="cgv" required> J’accepte les&nbsp;<a href="conditions.html" target="_blank">conditions de réservation</a>. Le séjour se règle à la réception (Mobile Money, carte, espèces).</label>
+      <p class="avl-err" id="cf-err" role="alert"></p>
+      <button class="btn" type="submit" id="cf-go">Confirmer ma réservation</button>
     </form>
   </div>
 </div></section>

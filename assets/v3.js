@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         $("#s-cat").textContent=r.cat;$("#s-name").textContent=r.n;$("#s-atout").textContent=r.at;
         $("#s-feats").innerHTML=r.f.concat([T("Petit-déjeuner inclus","Breakfast included")]).map(function(x){return"<li>"+esc(x)+"</li>"}).join("");
         $("#s-price").innerHTML=r.p==null?T("Sur demande","On request"):T("Dès ","From ")+fc(r.p)+" <small>/ "+T("nuit","night")+"</small>";
-        $("#s-book").href=A.resv+"?chambre="+r.id;$("#s-more").href=r.url;
+        $("#s-book").href=r.url;$("#s-more").href=r.url;
         $("#s-bar").style.width=((ci+1)/list.length*100)+"%";panel.classList.remove("out");
       }
       if(first||reduce)fill();else{panel.classList.add("out");setTimeout(fill,280)}
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       function fill(){
         $("#sw-c").textContent=r.cat;$("#sw-n").textContent=r.n;$("#sw-g").textContent=r.gem;$("#sw-d").textContent=r.at.replace(/\.$/,"")+". "+T("Idéal pour : ","Ideal for: ")+r.ideal;
         $("#sw-p").innerHTML=r.p==null?T("Tarif sur demande","Rate on request"):T("Dès ","From ")+fc(r.p)+" <small>/ "+T("nuit","night")+"</small>";
-        $("#sw-l").href=r.url;$("#sw-b").href=A.resv+"?chambre="+r.id;inf.classList.remove("out");
+        $("#sw-l").href=r.url;$("#sw-b").href=r.url;inf.classList.remove("out");
       }
       if(first||reduce)fill();else{inf.classList.add("out");setTimeout(fill,260)}
     };
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   if(grid){
     grid.innerHTML=R.map(function(r){
       var fig=r.img?'<a href="'+r.url+'" class="fig"><figure style="background:'+r.pbg+'"><img src="assets/img/'+r.img+'" alt="'+esc(r.n)+'" loading="lazy"></figure></a>':'<a href="'+r.url+'" class="fig"><figure class="soon" style="background:'+r.pbg+'"><img src="assets/img/logo-big.png" alt=""><span>'+T("Photos à venir","Photos coming soon")+'</span></figure></a>';
-      return '<article class="rc" id="rc-'+r.id+'" data-t="'+r.t+'" data-sea="'+(r.sea?1:0)+'">'+fig+'<span class="cat">'+esc(r.cat)+'</span><h3><a href="'+r.url+'">'+esc(r.n)+'</a></h3>'+(r.sea?'<span class="seab">'+T("Face à la mer","Facing the sea")+'</span>':'')+'<p class="at">'+esc(r.at)+'</p><dl><dt>'+T("Couchage","Sleeping")+'</dt><dd>'+esc(r.bed)+'</dd><dt>'+T("Cuisine","Kitchen")+'</dt><dd>'+esc(r.kit)+'</dd><dt>'+T("Idéal pour","Ideal for")+'</dt><dd>'+esc(r.ideal)+'</dd></dl><div class="ft2"><span class="pr">'+(r.p==null?T("Sur demande","On request"):fc(r.p)+' <small>/ '+T("nuit","night")+'</small>')+'</span><a class="lnk" href="'+A.resv+'?chambre='+r.id+'">'+T("Réserver","Book")+'</a></div><label class="chk"><input type="checkbox" value="'+r.id+'"> '+T("Comparer","Compare")+'</label></article>';
+      return '<article class="rc" id="rc-'+r.id+'" data-t="'+r.t+'" data-sea="'+(r.sea?1:0)+'">'+fig+'<span class="cat">'+esc(r.cat)+'</span><h3><a href="'+r.url+'">'+esc(r.n)+'</a></h3>'+(r.sea?'<span class="seab">'+T("Face à la mer","Facing the sea")+'</span>':'')+'<p class="at">'+esc(r.at)+'</p><dl><dt>'+T("Couchage","Sleeping")+'</dt><dd>'+esc(r.bed)+'</dd><dt>'+T("Cuisine","Kitchen")+'</dt><dd>'+esc(r.kit)+'</dd><dt>'+T("Idéal pour","Ideal for")+'</dt><dd>'+esc(r.ideal)+'</dd></dl><div class="ft2"><span class="pr">'+(r.p==null?T("Sur demande","On request"):fc(r.p)+' <small>/ '+T("nuit","night")+'</small>')+'</span><a class="lnk" href="'+r.url+'">'+T("Réserver","Book")+'</a></div><label class="chk"><input type="checkbox" value="'+r.id+'"> '+T("Comparer","Compare")+'</label></article>';
     }).join("");
     $$("#rf button").forEach(function(b){b.addEventListener("click",function(){$$("#rf button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});var f=b.dataset.f;$$(".rc").forEach(function(c){c.hidden=!(f==="all"||c.dataset.t===f||(f==="sea"&&c.dataset.sea==="1"))})})});
     var sel=[],tray=$("#tray"),dlg=$("#cmp");
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     $("#tgo").onclick=function(){
       var rs=sel.map(function(id){return byId[id]});
       var prices=rs.filter(function(r){return r.p!=null}).map(function(r){return r.p}),min=Math.min.apply(null,prices);
-      var rows=[[T("Catégorie","Category"),function(r){return esc(r.cat)}],[T("Atout","Highlight"),function(r){return esc(r.at)}],[T("Idéal pour","Ideal for"),function(r){return esc(r.ideal)}],[T("Prix / nuit","Price / night"),function(r){return fc(r.p)+(r.p===min&&prices.length>1?'<span class="best">'+T("Meilleur prix","Best price")+'</span>':"")}],[T("Couchage","Sleeping"),function(r){return esc(r.bed)}],[T("Cuisine","Kitchen"),function(r){return esc(r.kit)}],[T("Salon","Lounge"),function(r){return esc(r.sal)}],[T("Petit-déjeuner","Breakfast"),function(){return T("Inclus","Included")}],["",function(r){return '<a class="btn" href="'+A.resv+'?chambre='+r.id+'" style="min-height:44px;padding:0 18px">'+T("Réserver","Book")+'</a>'}]];
+      var rows=[[T("Catégorie","Category"),function(r){return esc(r.cat)}],[T("Atout","Highlight"),function(r){return esc(r.at)}],[T("Idéal pour","Ideal for"),function(r){return esc(r.ideal)}],[T("Prix / nuit","Price / night"),function(r){return fc(r.p)+(r.p===min&&prices.length>1?'<span class="best">'+T("Meilleur prix","Best price")+'</span>':"")}],[T("Couchage","Sleeping"),function(r){return esc(r.bed)}],[T("Cuisine","Kitchen"),function(r){return esc(r.kit)}],[T("Salon","Lounge"),function(r){return esc(r.sal)}],[T("Petit-déjeuner","Breakfast"),function(){return T("Inclus","Included")}],["",function(r){return '<a class="btn" href="'+r.url+'" style="min-height:44px;padding:0 18px">'+T("Réserver","Book")+'</a>'}]];
       $("#cmp-body").innerHTML='<table><colgroup><col class="c0">'+rs.map(function(){return'<col>'}).join("")+'</colgroup><thead><tr><th></th>'+rs.map(function(r){return '<th>'+(r.img?'<img src="assets/img/'+r.img+'" alt="">':'')+'<a href="'+r.url+'">'+esc(r.n)+'</a></th>'}).join("")+'</tr></thead><tbody>'+rows.map(function(x){return '<tr><th scope="row">'+x[0]+'</th>'+rs.map(function(r){return '<td>'+x[1](r)+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table>';
       if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");
     };
@@ -487,7 +487,39 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     },true);
   }
 
-  function start(){results();resvPage()}
+  /* ===== fiche chambre : étape de confirmation ===== */
+  function roomPage(){
+    var f=$("#rbook"),sec=$("#confirmer"),cf=$("#cf-f");if(!f||!sec||!cf)return;
+    var id=f.chambre.value,r=byId[id],st=null,msg=$("#rb-msg");
+    function opts(){return readOpts(cf)}
+    function recap(){if(!st)return;var n=nights(st.a,st.d),LG=n>30;
+      $("#cf-dates").textContent=fdate(st.a)+" → "+fdate(st.d);$("#cf-n").textContent=nn(n);
+      $("#cf-g").textContent=st.ad+" "+T(st.ad>1?"adultes":"adulte",st.ad>1?"adults":"adult")+(st.en?" · "+st.en+" "+T(st.en>1?"enfants":"enfant",st.en>1?"children":"child"):"");
+      $("#cf-rate").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p)+'</span>':T("Sur demande","On request"));
+      $("#cf-tot").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p*n)+'</span>':T("Confirmé par la réception","Confirmed by reception"));
+      var o=opts();$("#cf-opts").textContent=o.length?o.join(" · "):"—";
+      $("#cf-go").textContent=LG?T("Envoyer ma demande de devis","Send my quote request"):(api.ready?T("Confirmer ma réservation","Confirm my booking"):T("Je réserve dès maintenant","Book now"));
+      cur(sec)}
+    cf.addEventListener("change",recap);cf.addEventListener("input",recap);
+    $("#cf-edit").onclick=function(e){e.preventDefault();f.scrollIntoView({behavior:"smooth",block:"center"})};
+    f.addEventListener("submit",function(e){e.preventDefault();msg.textContent="";
+      var a=f.arrivee.value,d=f.depart.value;if(!a||!d||d<=a){msg.textContent=T("Choisissez vos dates d’arrivée et de départ.","Choose your check-in and check-out dates.");return}
+      st={a:a,d:d,ad:+f.adultes.value||2,en:+f.enfants.value||0};
+      var go=$("button[type=submit]",f),lbl=go.textContent;
+      function show(){sec.hidden=false;recap();setTimeout(function(){sec.scrollIntoView({behavior:"smooth",block:"start"})},50)}
+      if(!api.ready){show();return}
+      go.disabled=true;go.textContent=T("Vérification…","Checking…");
+      fetchDispo().then(function(m){go.disabled=false;go.textContent=lbl;
+        if(freeFor(m,id,a,d)){show();return}
+        sec.hidden=true;msg.innerHTML=T("Cette chambre est indisponible à ces dates. ","This room is unavailable for these dates. ")+'<a href="'+A.avail+'?arrivee='+a+'&depart='+d+'&adultes='+st.ad+'&enfants='+st.en+'">'+T("Voir les autres chambres libres","See other available rooms")+'</a>';
+      },function(){go.disabled=false;go.textContent=lbl;show()});
+    });
+    cf.addEventListener("submit",function(e){e.preventDefault();if(!st)return;var err=$("#cf-err");err.textContent="";if(!validate(cf,err))return;
+      var go=$("#cf-go"),lbl=go.textContent;go.disabled=true;go.textContent=T("Un instant…","One moment…");
+      (api.ready?api.book:api.request)({picks:[{room:id}],a:st.a,d:st.d,ad:st.ad,en:st.en,options:opts(),who:{nom:cf.nom.value.trim(),tel:cf.tel.value.trim(),email:cf.email.value.trim(),msg:cf.msg.value.trim()}})
+        .then(function(it){api.done($(".wrap",sec),it)},function(e2){go.disabled=false;go.textContent=lbl;err.innerHTML=errMsg(e2)+(e2&&e2.taken?' <a href="'+A.avail+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Voir les chambres libres","See available rooms")+'</a>':'')})});
+  }
+  function start(){results();resvPage();roomPage()}
   if(!window.claude||!window.claude.use){start();return}
   Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(x){
     db=x[0];var user=x[1];if(!db||!user){start();return}
