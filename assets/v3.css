@@ -985,3 +985,13 @@ dialog.avl::backdrop{background:rgba(16,22,52,.55);backdrop-filter:blur(3px)}
 @keyframes hkSheen{0%,100%{background-position:100% 0}50%{background-position:0 0}}
 @media (max-width:640px){.hk-t{font-size:.7rem;letter-spacing:.32em}.hk-x{font-size:1.25rem}.hk-l{width:28px}}
 @media (prefers-reduced-motion:reduce){.hk-l,.hk-t i,.hk-x{animation:none!important;opacity:1;transform:none;filter:none}}
+
+/* barre « Continuer » : version mobile */
+.res-bar #res-bar-t{min-width:0}
+.res-bar .btn{white-space:nowrap;flex:none}
+@media (max-width:760px){
+  .res-bar{left:12px;right:84px;bottom:16px;transform:none;max-width:none;gap:10px;padding:8px 8px 8px 16px;border-radius:18px}
+  .res-bar.away{transform:translateY(20px)}
+  .res-bar #res-bar-t{flex:1;font-size:.78rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .res-bar .btn{padding:12px 16px;font-size:.68rem;letter-spacing:.14em}
+}
