@@ -416,6 +416,11 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     if(bad.length){err.textContent=T("Merci de compléter les champs obligatoires.","Please fill in the required fields.");bad[0].focus();return false}return true;
   }
 
+  function goContact(o){
+    var st={picks:o.picks,a:o.a,d:o.d,ad:o.ad,en:o.en,options:o.options||[],back:location.pathname.split("/").pop()+location.search};
+    try{sessionStorage.setItem("agr-sel",JSON.stringify(st))}catch(e){}
+    location.href=A.contact+"?s="+encodeURIComponent(JSON.stringify(st));
+  }
   /* ===== page « Chambres disponibles » ===== */
   function results(){
     var page=$("#res-wrap");if(!page)return;
@@ -453,21 +458,26 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         if(!c){var off=$$(".avl-r.off a",list).filter(function(a){return a.href.indexOf("chambre-"+st.room)>-1})[0];if(off)$("#res-note").innerHTML='<p class="avl-lg">'+T("Cette chambre n’est pas libre à ces dates. Voici les autres chambres disponibles.","This room isn’t available for these dates. Here are the other available rooms.")+'</p>'}}
       var f=$("#res-f");
       function picks(){return $$("input[data-room]:checked,input[data-cat]:checked",list).map(function(i){return i.dataset.room?{room:i.dataset.room}:{cat:i.dataset.cat}})}
-      function sel(){var p=picks();f.hidden=!p.length;$("#res-bar").hidden=!p.length;
+      function sel(){var p=picks();f.hidden=!p.length;$("#res-bar").hidden=!p.length;if(!p.length)$("#res-bar").classList.remove("open");
         if(!p.length)return p;
         var tot=0,lab=p.map(function(x){if(x.room){tot+=(byId[x.room].p||0)*n;return byId[x.room].n}var mn=Math.min.apply(null,R.filter(function(r){return r.cat===x.cat&&!UNITS[r.id]&&r.p!=null&&freeFor(m,r.id,st.a,st.d)}).map(function(r){return r.p}));tot+=mn*n;return T("Une chambre ","Any ")+x.cat.toLowerCase()});
         var s=lab.join(" + ")+' · '+nn(n)+' · <b>'+(LG?T("Sur devis","On quote"):'<span class="px">'+fc(tot)+'</span>')+'</b>';
-        $("#res-sum2").innerHTML=s;$("#res-bar-t").innerHTML=s;cur(f);cur($("#res-bar"));
-        $("#res-go").textContent=LG?T("Envoyer ma demande de devis","Send my quote request"):(OFF?T("Je réserve dès maintenant","Book now"):T("Confirmer ma réservation","Confirm my booking"));
-        $("#res-cgv").hidden=LG;$("[name=cgv]",f).disabled=LG;
+        $("#res-sum2").innerHTML=s;$("#res-bar-t").innerHTML=s+' <i class="rb-up" aria-hidden="true">▴</i>';cur(f);cur($("#res-bar"));
+        var pop=$("#res-pop");if(pop){var tt=0;pop.innerHTML='<p class="kick">'+T("Votre sélection","Your selection")+'</p>'+p.map(function(x){var r=x.room?byId[x.room]:R.filter(function(y){return y.cat===x.cat&&!UNITS[y.id]&&y.p!=null&&freeFor(m,y.id,st.a,st.d)}).sort(function(a2,b2){return a2.p-b2.p})[0];tt+=(r&&r.p||0)*n;
+            return '<div class="rp-r">'+(r&&r.img?'<img src="assets/img/'+r.img+'" alt="">':'<span class="ph">✦</span>')+'<span><b>'+(x.room?esc(r.n):T("Une chambre ","Any ")+esc(x.cat.toLowerCase()))+'</b><small>'+esc(r?r.cat:x.cat)+'</small></span><span class="pp">'+(LG?T("Sur devis","On quote"):'<span class="px">'+fc((r&&r.p||0)*n)+'</span>')+'</span><button type="button" class="rp-x" data-un="'+(x.room?'room:'+x.room:'cat:'+esc(x.cat))+'" aria-label="'+T("Retirer","Remove")+'">✕</button></div>'}).join("")+
+            '<div class="rp-d"><span>'+fdate(st.a)+' → '+fdate(st.d)+'</span><span>'+nn(n)+' · '+st.ad+' '+T(st.ad>1?"adultes":"adulte",st.ad>1?"adults":"adult")+(st.en?' · '+st.en+' '+T(st.en>1?"enfants":"enfant",st.en>1?"children":"child"):'')+'</span></div>'+
+            '<div class="rp-t"><span>Total · '+T("petit-déjeuner inclus","breakfast included")+'</span><b>'+(LG?T("Sur devis","On quote"):'<span class="px">'+fc(tt)+'</span>')+'</b></div>';
+          cur(pop);
+          $$("[data-un]",pop).forEach(function(bx){bx.onclick=function(){var v=bx.dataset.un,k=v.indexOf(":"),ty=v.slice(0,k),val=v.slice(k+1);var inp=ty==="room"?$('input[data-room="'+val+'"]',list):$$("input[data-cat]",list).filter(function(z){return z.dataset.cat===val})[0];if(inp){inp.checked=false;inp.dispatchEvent(new Event("change"))}}})}
+        $("#res-go").textContent=T("Continuer vers mes coordonnées","Continue to my details");
         return p}
       $$("input[data-room],input[data-cat]",list).forEach(function(i){i.addEventListener("change",sel)});sel();
-      $("#res-bar-go").onclick=function(){f.scrollIntoView({behavior:"smooth",block:"start"})};
+      $("#res-bar-go").onclick=function(){$("#res-bar").classList.remove("open");f.scrollIntoView({behavior:"smooth",block:"start"})};
+      $("#res-bar-t").onclick=function(){$("#res-bar").classList.toggle("open")};
+      document.addEventListener("click",function(ev){var bar=$("#res-bar");if(bar&&bar.classList.contains("open")&&!bar.contains(ev.target)&&!ev.target.closest("[data-un]"))bar.classList.remove("open")});
       if("IntersectionObserver" in window){var vis=false;new IntersectionObserver(function(es){vis=es[0].isIntersecting;$("#res-bar").classList.toggle("away",vis)}).observe(f)}
-      f.onsubmit=function(e){e.preventDefault();var p=sel(),err=$("#res-err");err.textContent="";if(!p.length)return;if(!validate(f,err))return;
-        var go=$("#res-go"),lbl=go.textContent;go.disabled=true;go.textContent=T("Un instant…","One moment…");
-        (OFF?api.request:api.book)({picks:p,a:st.a,d:st.d,ad:st.ad,en:st.en,options:readOpts(f),who:{nom:f.nom.value.trim(),tel:f.tel.value.trim(),email:f.email.value.trim(),msg:f.msg.value.trim()}})
-          .then(function(it){$("#res-bar").hidden=true;api.done($("#res-wrap"),it)},function(e){go.disabled=false;go.textContent=lbl;err.textContent=errMsg(e);if(e&&e.taken)setTimeout(results,1800)})};
+      f.onsubmit=function(e){e.preventDefault();var p=sel(),err=$("#res-err");err.textContent="";if(!p.length){err.textContent=T("Choisissez au moins une chambre.","Choose at least one room.");return}
+        goContact({picks:p,a:st.a,d:st.d,ad:st.ad,en:st.en,options:readOpts(f)})};
     },function(){list.innerHTML='<p class="avl-none">'+T("Impossible de vérifier les disponibilités pour le moment.","Availability can’t be checked right now.")+' <a href="'+A.resv+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Envoyer une demande","Send a request")+'</a></p>'});
   }
 
@@ -514,12 +524,33 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         sec.hidden=true;msg.innerHTML=T("Cette chambre est indisponible à ces dates. ","This room is unavailable for these dates. ")+'<a href="'+A.avail+'?arrivee='+a+'&depart='+d+'&adultes='+st.ad+'&enfants='+st.en+'">'+T("Voir les autres chambres libres","See other available rooms")+'</a>';
       },function(){go.disabled=false;go.textContent=lbl;show()});
     });
-    cf.addEventListener("submit",function(e){e.preventDefault();if(!st)return;var err=$("#cf-err");err.textContent="";if(!validate(cf,err))return;
-      var go=$("#cf-go"),lbl=go.textContent;go.disabled=true;go.textContent=T("Un instant…","One moment…");
-      (api.ready?api.book:api.request)({picks:[{room:id}],a:st.a,d:st.d,ad:st.ad,en:st.en,options:opts(),who:{nom:cf.nom.value.trim(),tel:cf.tel.value.trim(),email:cf.email.value.trim(),msg:cf.msg.value.trim()}})
-        .then(function(it){api.done($(".wrap",sec),it)},function(e2){go.disabled=false;go.textContent=lbl;err.innerHTML=errMsg(e2)+(e2&&e2.taken?' <a href="'+A.avail+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Voir les chambres libres","See available rooms")+'</a>':'')})});
+    cf.addEventListener("submit",function(e){e.preventDefault();if(!st)return;goContact({picks:[{room:id}],a:st.a,d:st.d,ad:st.ad,en:st.en,options:opts()})});
   }
-  function start(){results();resvPage();roomPage()}
+  /* ===== page « Vos coordonnées » ===== */
+  function coordPage(){
+    var f=$("#co-f");if(!f)return;var box=$("#co-sum"),st=null;
+    try{st=JSON.parse(new URLSearchParams(location.search).get("s")||"null")}catch(e){}
+    if(!st){try{st=JSON.parse(sessionStorage.getItem("agr-sel")||"null")}catch(e){}}
+    if(!st||!st.picks||!st.picks.length||!st.a||!st.d){$("#co-wrap").innerHTML='<p class="avl-none">'+T("Aucune sélection en cours. ","No selection in progress. ")+'<a href="'+(EN?"chambres-en.html":"chambres.html")+'">'+T("Choisir une chambre","Choose a room")+'</a></p>';return}
+    var n=nights(st.a,st.d),LG=n>30,tot=0,first=null;
+    var rows=st.picks.map(function(p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];if(!first)first=r;tot+=(r&&r.p||0)*n;
+      return '<div class="row"><span>'+(p.room?esc(r.n):T("Une chambre ","Any ")+esc(p.cat.toLowerCase()))+'</span><span>'+(LG?T("Sur devis","On quote"):(r&&r.p!=null?(p.room?'':T("dès ","from "))+'<span class="px">'+fc(r.p*n)+'</span>':T("Sur demande","On request")))+'</span></div>'}).join("");
+    box.innerHTML=(first&&first.img?'<img src="assets/img/'+first.img+'" alt="">':'')+'<div class="b"><p class="kick">'+T("Votre sélection","Your selection")+'</p>'+rows+
+      '<div class="row"><span>Dates</span><span>'+fdate(st.a)+' → '+fdate(st.d)+'</span></div><div class="row"><span>'+T("Durée","Length")+'</span><span>'+nn(n)+'</span></div>'+
+      '<div class="row"><span>'+T("Voyageurs","Guests")+'</span><span>'+st.ad+' '+T(st.ad>1?"adultes":"adulte",st.ad>1?"adults":"adult")+(st.en?' · '+st.en+' '+T(st.en>1?"enfants":"enfant",st.en>1?"children":"child"):'')+'</span></div>'+
+      '<div class="row"><span>'+T("Petit-déjeuner","Breakfast")+'</span><span>'+T("Inclus","Included")+'</span></div>'+
+      '<div class="row"><span>Options</span><span>'+(st.options&&st.options.length?esc(st.options.join(" · ")):"—")+'</span></div>'+
+      '<div class="tot"><span>Total</span><b>'+(LG?T("Sur devis","On quote"):'<span class="px">'+fc(tot)+'</span>')+'</b></div>'+
+      (st.back?'<a class="lnk" href="'+esc(st.back)+'">'+T("Modifier ma sélection","Change my selection")+'</a>':'')+'</div>';
+    cur(box);
+    $("#co-go").textContent=LG?T("Envoyer ma demande de devis","Send my quote request"):(api.ready?T("Confirmer ma réservation","Confirm my booking"):T("Je réserve dès maintenant","Book now"));
+    f.addEventListener("submit",function(e){e.preventDefault();var err=$("#co-err");err.textContent="";if(!validate(f,err))return;
+      var go=$("#co-go"),lbl=go.textContent;go.disabled=true;go.textContent=T("Un instant…","One moment…");
+      var nom=(f.prenom.value.trim()+" "+f.nom.value.trim()).trim(),m0=f.msg.value.trim(),py=f.pays.value.trim(),msg=m0+(py?(m0?" · ":"")+T("Pays : ","Country: ")+py:"");
+      (api.ready?api.book:api.request)({picks:st.picks,a:st.a,d:st.d,ad:st.ad,en:st.en,options:st.options,who:{nom:nom,tel:f.tel.value.trim(),email:f.email.value.trim(),msg:msg}})
+        .then(function(it){try{sessionStorage.removeItem("agr-sel")}catch(e){}api.done($("#co-wrap"),it)},function(e2){go.disabled=false;go.textContent=lbl;err.innerHTML=errMsg(e2)+(e2&&e2.taken?' <a href="'+A.avail+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Voir les chambres libres","See available rooms")+'</a>':'')})});
+  }
+  function start(){results();resvPage();roomPage();coordPage()}
   if(!window.claude||!window.claude.use){start();return}
   Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(x){
     db=x[0];var user=x[1];if(!db||!user){start();return}
