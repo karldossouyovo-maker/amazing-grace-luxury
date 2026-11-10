@@ -1031,3 +1031,6 @@ dialog.avl::backdrop{background:rgba(16,22,52,.55);backdrop-filter:blur(3px)}
 @media (max-width:760px){.res-pop{right:-72px}}
 .res-bar.open{z-index:70}
 .rp-t b{white-space:nowrap}
+
+.gemq{min-height:1.4em}
+.gemq:empty{min-height:2.8em}

@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   function cur(el){if(window.AGRcur)window.AGRcur.apply(el)}
   function nn(n){return n+" "+(n>1?T("nuits","nights"):T("nuit","night"))}
   var CATS=[];R.forEach(function(r){if(!UNITS[r.id]&&CATS.indexOf(r.cat)<0)CATS.push(r.cat)});
-  var db=null,uid=null;
+  var db=null,uid=null,SHEET=null;
   var api=window.AGRbook={ready:false};
 
   /* options : départ tardif (heure) + navette (véhicule) — affichage des sous-champs */
@@ -331,6 +331,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   api.wireOpts=wireOpts;wireOpts(document);
 
   function fetchDispo(){
+    if(SHEET)return fetch(SHEET,{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){if(!j||!j.ok)throw {};return j.ranges||{}});
     var timer;return Promise.race([db.collection("dispo").get(),new Promise(function(_,rej){timer=setTimeout(function(){rej({code:"timeout"})},10000)})]).then(function(q){clearTimeout(timer);var m={};q.docs.forEach(function(s){m[s.id]=(s.data()||{}).ranges||[]});return m});
   }
   function freeFor(m,id,a,d){return units(id).every(function(u){return !overlap(m[u],a,d)})}
@@ -355,7 +356,21 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     }catch(e){}
   }
   /* réservation : verrous, re-vérification, écriture */
+  function sheetBook(o){
+    var n=nights(o.a,o.d),LG=n>30;
+    var picks=o.picks.map(function(p){
+      if(p.room)return {candidates:[p.room],label:byId[p.room].n};
+      return {candidates:R.filter(function(r){return r.cat===p.cat&&!UNITS[r.id]&&r.p!=null}).sort(function(x,y){return x.p-y.p}).map(function(r){return r.id}),label:p.cat}});
+    var est=o.picks.reduce(function(s,p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];return s+(r&&r.p||0)*n},0);
+    var body={picks:picks,a:o.a,d:o.d,ad:o.ad,en:o.en,options:o.options||[],who:o.who,devis:LG,lang:A.lang,total:LG?"":fc(est)};
+    return fetch(SHEET,{method:"POST",body:JSON.stringify(body),headers:{"Content-Type":"text/plain;charset=utf-8"}}).then(function(r){return r.json()}).then(function(j){
+      if(!j||!j.ok)throw (j&&j.taken?{taken:j.taken}:{});
+      var tot=LG?null:j.rooms.reduce(function(s,id){return s+(byId[id]&&byId[id].p||0)*n},0);
+      return {ref:j.ref,rooms:j.rooms,a:o.a,d:o.d,nuits:n,adultes:o.ad,enfants:o.en,total:tot,options:o.options,st:LG?"devis":"confirmee"};
+    });
+  }
   api.book=function(o){ /* o: {picks,a,d,ad,en,who,options,late} */
+    if(SHEET)return sheetBook(o);
     var n=nights(o.a,o.d),LG=n>30,ref=mkref(LG?"DEV":"AGR");
     if(LG){var m0={};return fetchDispo().then(function(m){m0=m;var r=resolve(o.picks,m,o.a,o.d);
         return saveResa({ref:ref,rooms:r.rooms.map(function(x){return x.id}),a:o.a,d:o.d,nuits:n,adultes:o.ad,enfants:o.en,total:null,options:o.options,nom:o.who.nom,tel:o.who.tel,email:o.who.email,msg:o.who.msg,lang:A.lang,st:"devis",at:new Date().toISOString()})})}
@@ -551,11 +566,12 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         .then(function(it){try{sessionStorage.removeItem("agr-sel")}catch(e){}api.done($("#co-wrap"),it)},function(e2){go.disabled=false;go.textContent=lbl;err.innerHTML=errMsg(e2)+(e2&&e2.taken?' <a href="'+A.avail+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Voir les chambres libres","See available rooms")+'</a>':'')})});
   }
   function start(){results();resvPage();roomPage();coordPage()}
-  if(!window.claude||!window.claude.use){start();return}
+  function noDb(){if(A.api){SHEET=A.api;api.ready=true}start()}
+  if(!window.claude||!window.claude.use){noDb();return}
   Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(x){
-    db=x[0];var user=x[1];if(!db||!user){start();return}
+    db=x[0];var user=x[1];if(!db||!user){noDb();return}
     return user.id().then(function(id){uid=id;api.ready=!!uid;start()});
-  }).catch(function(){start()});
+  }).catch(function(){noDb()});
 })();
 
 /* ── Espace réception ── */
