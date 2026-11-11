@@ -51,10 +51,11 @@
       <div class="fld"><label for="co-em">Email</label><input id="co-em" name="email" type="email" autocomplete="email" required></div></div>
       <div class="fld"><label for="co-pays">Country of residence (optional)</label><input id="co-pays" name="pays" autocomplete="country-name"></div>
       <div class="fld"><label for="co-msg">A special request? (optional)</label><textarea id="co-msg" name="msg" rows="3"></textarea></div>
-      <label class="avl-ok"><input type="checkbox" name="cgv" required> I accept the&nbsp;<a href="conditions-en.html" target="_blank">booking terms</a>. The stay is paid at reception (Mobile Money, card, cash).</label>
+      <fieldset class="payx"><legend>How would you like to pay?</legend><div class="payg"><label class="payc"><input type="radio" name="paiement" value="Mobile Money" data-pay="momo" data-hint="We send you the hotel’s number." checked><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg><span><b>Mobile Money</b><small>MTN MoMo · Moov Money · Celtiis Cash</small></span></label><label class="payc"><input type="radio" name="paiement" value="Bank transfer" data-pay="vir" data-hint="We send you the hotel’s bank details."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20.5h18"/></svg><span><b>Bank transfer</b><small>Ideal from abroad</small></span></label><label class="payc"><input type="radio" name="paiement" value="On arrival" data-pay="rec" data-hint="You pay on site."><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19M6 15h4"/></svg><span><b>On arrival</b><small>Cash or card at reception</small></span></label></div><p class="pay-note">✓ No fees, nothing to pay online: reception sends you the payment details after your booking.</p></fieldset>
+      <label class="avl-ok"><input type="checkbox" name="cgv" required><span>I accept the <a href="conditions-en.html" target="_blank">booking terms</a>.</span></label>
       <p class="avl-err" id="co-err" role="alert"></p>
       <button class="btn" type="submit" id="co-go">Confirm my booking</button>
-      <p class="co-safe">✓ Nothing to pay online · ✓ Breakfast included · ✓ 24-hour reception</p>
+      <p class="co-safe">✓ No payment fees · ✓ Breakfast included · ✓ 24-hour reception</p>
     </form>
   </div>
 </div></section>
