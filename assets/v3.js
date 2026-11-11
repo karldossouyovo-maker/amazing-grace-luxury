@@ -305,6 +305,22 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   [].forEach.call(p.querySelectorAll(".wc-q button"),function(q){q.onclick=function(){inp.value=q.textContent+" : ";inp.focus()}});
 })();
 
+/* Petits détails : toute la case ouvre la liste ou le calendrier */
+(function(){
+  document.addEventListener("click",function(e){
+    var f=e.target.closest&&e.target.closest(".fld");
+    if(!f||e.target.closest("input,select,textarea,a,button"))return;
+    var c=f.querySelector("select,input:not([type=hidden]):not([type=checkbox]),textarea");
+    if(!c)return;
+    c.focus();
+    if(c.showPicker&&(c.tagName==="SELECT"||c.type==="date")){try{c.showPicker()}catch(x){}}
+  });
+  document.addEventListener("click",function(e){
+    var d=e.target;
+    if(d.tagName==="INPUT"&&d.type==="date"&&d.showPicker){try{d.showPicker()}catch(x){}}
+  });
+})();
+
 /* ── Réservation instantanée : page « Chambres disponibles » + page Réserver ── */
 (function(){
   var $=function(s,c){return (c||document).querySelector(s)}, $$=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};

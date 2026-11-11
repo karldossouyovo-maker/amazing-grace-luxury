@@ -1035,3 +1035,33 @@ dialog.avl::backdrop{background:rgba(16,22,52,.55);backdrop-filter:blur(3px)}
 .gemq{min-height:1.4em}
 .gemq:empty{min-height:2.8em}
 @media (min-width:900px){.facts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* ===== Petits détails (11 nov.) ===== */
+/* listes déroulantes : chevron doré */
+.fld select,.optsub select,.rc-bf select{cursor:pointer;padding-right:34px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' fill='none' stroke='%239c7a3c' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 6px center!important;background-size:14px 9px!important}
+.optsub select,.rc-bf select{background-color:#fff!important;background-position:right 12px center!important}
+.fld select:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 7.5l6-6 6 6' fill='none' stroke='%231f2c66' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important}
+.cur{padding-right:24px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%239c7a3c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-size:10px 6px}
+/* dates : petite icône calendrier, toute la case ouvre le calendrier */
+.fld input[type=date]{cursor:pointer;position:relative;padding-right:30px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239c7a3c' stroke-width='1.5' stroke-linecap='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='2.5'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4'/%3E%3C/svg%3E") no-repeat right 4px center/18px 18px}
+.fld input[type=date]::-webkit-calendar-picker-indicator{opacity:0;cursor:pointer;position:absolute;inset:0;width:auto;height:auto}
+.fld input[type=date]::-webkit-date-and-time-value{text-align:left}
+/* champs : la case active s'éclaire */
+.fld{transition:background-color .25s ease,box-shadow .25s ease;cursor:pointer}
+.fld:focus-within{background-color:#fffdf8;box-shadow:inset 0 -2px 0 var(--gold-soft)}
+.fld:focus-within>label{color:var(--gold)}
+.fld:has(input[type=text],input[type=email],input[type=tel],textarea){cursor:text}
+/* finitions générales */
+::selection{background:#ecdcb4;color:var(--navy)}
+html{-webkit-tap-highlight-color:transparent}
+input[type=checkbox],input[type=radio]{accent-color:var(--navy)}
+.btn,button,[role=button]{transition:transform .15s ease,background-color .25s,color .25s,box-shadow .25s}
+.btn:active,button:active{transform:scale(.97)}
+:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+h1,h2,h3{text-wrap:balance}
+p,li{text-wrap:pretty}
+.px,.price,.prix,[id$=-tot],.gcard{font-variant-numeric:tabular-nums lining-nums}
+[id]{scroll-margin-top:110px}
+img{-webkit-user-drag:none}
+.fld input[type=date]{padding-right:22px;background-position:right 0 center;background-size:16px 16px}
+@media (max-width:700px){.fld input[type=date]{font-size:1.12rem;letter-spacing:-.01em}}
