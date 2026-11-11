@@ -51,11 +51,10 @@
       <div class="fld"><label for="co-em">Email</label><input id="co-em" name="email" type="email" autocomplete="email" required></div></div>
       <div class="fld"><label for="co-pays">Pays de résidence (facultatif)</label><input id="co-pays" name="pays" autocomplete="country-name"></div>
       <div class="fld"><label for="co-msg">Une demande particulière ? (facultatif)</label><textarea id="co-msg" name="msg" rows="3"></textarea></div>
-      <fieldset class="payx"><legend>Comment souhaitez-vous régler ?</legend><div class="payg"><label class="payc"><input type="radio" name="paiement" value="Mobile Money" data-pay="momo" data-hint="Nous vous envoyons le numéro de l’hôtel." checked><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg><span><b>Mobile Money</b><small>MTN MoMo · Moov Money · Celtiis Cash</small></span></label><label class="payc"><input type="radio" name="paiement" value="Virement bancaire" data-pay="vir" data-hint="Nous vous envoyons le RIB de l’hôtel."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20.5h18"/></svg><span><b>Virement bancaire</b><small>Idéal depuis l’étranger</small></span></label><label class="payc"><input type="radio" name="paiement" value="À l’arrivée" data-pay="rec" data-hint="Vous réglez sur place."><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19M6 15h4"/></svg><span><b>À l’arrivée</b><small>Espèces ou carte bancaire à la réception</small></span></label></div><p class="pay-note">✓ Aucun frais, aucun paiement en ligne : la réception vous envoie les informations de paiement après votre réservation.</p></fieldset>
-      <label class="avl-ok"><input type="checkbox" name="cgv" required><span>J’accepte les <a href="conditions.html" target="_blank">conditions de réservation</a>.</span></label>
+      <label class="avl-ok"><input type="checkbox" name="cgv" required> J’accepte les&nbsp;<a href="conditions.html" target="_blank">conditions de réservation</a>. Le séjour se règle à la réception (Mobile Money, carte, espèces).</label>
       <p class="avl-err" id="co-err" role="alert"></p>
       <button class="btn" type="submit" id="co-go">Confirmer ma réservation</button>
-      <p class="co-safe">✓ Aucun frais de paiement · ✓ Petit-déjeuner inclus · ✓ Réception 24 h/24</p>
+      <p class="co-safe">✓ Aucun paiement en ligne · ✓ Petit-déjeuner inclus · ✓ Réception 24 h/24</p>
     </form>
   </div>
 </div></section>
