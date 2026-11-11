@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       
       $("#rc-opts").textContent=opts.length?opts.join(", "):"—";
       $("#rc-flag").hidden=!hol;
-      var lg=n>30;var tot=r&&r.p!=null&&n&&!lg?r.p*n*rooms:null;$("#rc-rate").textContent=lg?T("Sur devis","On quote"):(r?(cat?T("dès ","from "):"")+fc(r.p):"—");
+      var lg=n>30,late=!!$(".opts input[name=tardif]:checked");var tot=r&&r.p!=null&&n&&!lg?r.p*n*rooms+(late?Math.round(r.p/2)*rooms:0):null;$("#rc-rate").textContent=lg?T("Sur devis","On quote"):(r?(cat?T("dès ","from "):"")+fc(r.p):"—");
       $("#rc-total").textContent=tot!=null?fc(tot):(lg?T("Sur devis : notre équipe évalue le tarif","On quote: our team prices your stay"):T("Total confirmé par la réception","Total confirmed by reception"));
       $("#rc-eur").textContent=tot!=null?T("estimation, petit-déjeuner compris","estimate, breakfast included"):"";
       $("#h-nights").value=n;$("#h-total").value=tot!=null?fc(tot):T("À confirmer","To be confirmed");
@@ -319,6 +319,8 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   function overlap(rs,a,d){return (rs||[]).some(function(x){return x.st!=="annulee"&&x.a<d&&x.d>a})}
   function mkref(p){var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s="";for(var i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return (p||"AGR")+"-"+s}
   function cur(el){if(window.AGRcur)window.AGRcur.apply(el)}
+  function isLate(o){return (o||[]).some(function(x){return /^(Départ tardif|Late check-out)/.test(x)})}
+  function nightly(ids){return ids.reduce(function(s,id){return s+(byId[id]&&byId[id].p||0)},0)}
   function nn(n){return n+" "+(n>1?T("nuits","nights"):T("nuit","night"))}
   var CATS=[];R.forEach(function(r){if(!UNITS[r.id]&&CATS.indexOf(r.cat)<0)CATS.push(r.cat)});
   var db=null,uid=null,SHEET=null;
@@ -362,10 +364,11 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       if(p.room)return {candidates:[p.room],label:byId[p.room].n};
       return {candidates:R.filter(function(r){return r.cat===p.cat&&!UNITS[r.id]&&r.p!=null}).sort(function(x,y){return x.p-y.p}).map(function(r){return r.id}),label:p.cat}});
     var est=o.picks.reduce(function(s,p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];return s+(r&&r.p||0)*n},0);
+    if(isLate(o.options))est+=Math.round(o.picks.reduce(function(s,p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];return s+(r&&r.p||0)},0)/2);
     var body={picks:picks,a:o.a,d:o.d,ad:o.ad,en:o.en,options:o.options||[],who:o.who,devis:LG,lang:A.lang,total:LG?"":fc(est)};
     return fetch(SHEET,{method:"POST",body:JSON.stringify(body),headers:{"Content-Type":"text/plain;charset=utf-8"}}).then(function(r){return r.json()}).then(function(j){
       if(!j||!j.ok)throw (j&&j.taken?{taken:j.taken}:{});
-      var tot=LG?null:j.rooms.reduce(function(s,id){return s+(byId[id]&&byId[id].p||0)*n},0);
+      var tot=LG?null:j.rooms.reduce(function(s,id){return s+(byId[id]&&byId[id].p||0)*n},0)+(isLate(o.options)?Math.round(nightly(j.rooms)/2):0);
       return {ref:j.ref,rooms:j.rooms,a:o.a,d:o.d,nuits:n,adultes:o.ad,enfants:o.en,total:tot,options:o.options,st:LG?"devis":"confirmee"};
     });
   }
@@ -387,7 +390,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       return allU.reduce(function(p,u){return p.then(function(){return db.doc("dispo/"+u).set({ranges:cur0[u].concat([{a:o.a,d:o.d,ref:ref,src:"site",st:"confirmee"}])})})},Promise.resolve());
     }).then(function(){
       var ids=res.rooms.map(function(x){return x.id});
-      var tot=ids.reduce(function(s,id){return s+(byId[id].p||0)*n},0);
+      var tot=ids.reduce(function(s,id){return s+(byId[id].p||0)*n},0)+(isLate(o.options)?Math.round(nightly(ids)/2):0);
       return saveResa({ref:ref,rooms:ids,parCategorie:res.rooms.filter(function(x){return x.viaCat}).map(function(x){return x.viaCat}),a:o.a,d:o.d,nuits:n,adultes:o.ad,enfants:o.en,total:tot,options:o.options,nom:o.who.nom,tel:o.who.tel,email:o.who.email,msg:o.who.msg,lang:A.lang,st:"confirmee",at:new Date().toISOString()});
     });
   };
@@ -395,6 +398,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     var n=nights(o.a,o.d),LG=n>30,ref=mkref(LG?"DEV":"DEM");
     var ids=o.picks.map(function(p){return p.room||null}).filter(Boolean),cats=o.picks.filter(function(p){return p.cat}).map(function(p){return p.cat});
     var tot=LG?null:o.picks.reduce(function(s,p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];return s+(r&&r.p||0)*n},0);
+    if(tot!=null&&isLate(o.options))tot+=Math.round(o.picks.reduce(function(s,p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];return s+(r&&r.p||0)},0)/2);
     var it={ref:ref,rooms:ids,cats:cats,a:o.a,d:o.d,nuits:n,adultes:o.ad,enfants:o.en,total:tot,options:o.options,nom:o.who.nom,tel:o.who.tel,email:o.who.email,msg:o.who.msg,st:LG?"devis":"demande"};
     var b=new FormData();b.append("_subject",(LG?"Demande de devis ":"Demande de réservation ")+ref+" · Amazing Grace Luxury");b.append("_template","table");b.append("_captcha","false");
     b.append("_cc","reception.agrluxury@gmail.com");
@@ -422,7 +426,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   function readOpts(f){
     var o=[];
     if(f.navette&&f.navette.checked)o.push(T("Navette aéroport","Airport shuttle")+" ("+f.vehicule.value+(f.vol&&f.vol.value.trim()?", "+f.vol.value.trim():"")+")");
-    if(f.tardif&&f.tardif.checked)o.push(T("Départ tardif","Late check-out")+" : "+f.heure.value+" ("+T("supplément","extra charge")+")");
+    if(f.tardif&&f.tardif.checked)o.push(T("Départ tardif","Late check-out")+" : "+f.heure.value+" ("+T("+50 % d’une nuit","+50% of one night")+")");
     $$("input[data-xopt]:checked",f).forEach(function(x){o.push(x.dataset.xopt)});
     return o;
   }
@@ -521,8 +525,8 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       $("#cf-dates").textContent=fdate(st.a)+" → "+fdate(st.d);$("#cf-n").textContent=nn(n);
       $("#cf-g").textContent=st.ad+" "+T(st.ad>1?"adultes":"adulte",st.ad>1?"adults":"adult")+(st.en?" · "+st.en+" "+T(st.en>1?"enfants":"enfant",st.en>1?"children":"child"):"");
       $("#cf-rate").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p)+'</span>':T("Sur demande","On request"));
-      $("#cf-tot").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p*n)+'</span>':T("Confirmé par la réception","Confirmed by reception"));
-      var o=opts();$("#cf-opts").textContent=o.length?o.join(" · "):"—";
+      var o=opts(),lt=isLate(o)&&r.p!=null?Math.round(r.p/2):0;
+      $("#cf-tot").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p*n+lt)+'</span>':T("Confirmé par la réception","Confirmed by reception"));$("#cf-opts").textContent=o.length?o.join(" · "):"—";
       $("#cf-go").textContent=LG?T("Envoyer ma demande de devis","Send my quote request"):(api.ready?T("Confirmer ma réservation","Confirm my booking"):T("Je réserve dès maintenant","Book now"));
       cur(sec)}
     cf.addEventListener("change",recap);cf.addEventListener("input",recap);
@@ -547,14 +551,16 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     try{st=JSON.parse(new URLSearchParams(location.search).get("s")||"null")}catch(e){}
     if(!st){try{st=JSON.parse(sessionStorage.getItem("agr-sel")||"null")}catch(e){}}
     if(!st||!st.picks||!st.picks.length||!st.a||!st.d){$("#co-wrap").innerHTML='<p class="avl-none">'+T("Aucune sélection en cours. ","No selection in progress. ")+'<a href="'+(EN?"chambres-en.html":"chambres.html")+'">'+T("Choisir une chambre","Choose a room")+'</a></p>';return}
-    var n=nights(st.a,st.d),LG=n>30,tot=0,first=null;
-    var rows=st.picks.map(function(p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];if(!first)first=r;tot+=(r&&r.p||0)*n;
+    var n=nights(st.a,st.d),LG=n>30,tot=0,first=null,lateFee=0;
+    var rows=st.picks.map(function(p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];if(!first)first=r;tot+=(r&&r.p||0)*n;if(isLate(st.options))lateFee+=Math.round((r&&r.p||0)/2);
       return '<div class="row"><span>'+(p.room?esc(r.n):T("Une chambre ","Any ")+esc(p.cat.toLowerCase()))+'</span><span>'+(LG?T("Sur devis","On quote"):(r&&r.p!=null?(p.room?'':T("dès ","from "))+'<span class="px">'+fc(r.p*n)+'</span>':T("Sur demande","On request")))+'</span></div>'}).join("");
+    tot+=lateFee;
     box.innerHTML=(first&&first.img?'<img src="assets/img/'+first.img+'" alt="">':'')+'<div class="b"><p class="kick">'+T("Votre sélection","Your selection")+'</p>'+rows+
       '<div class="row"><span>Dates</span><span>'+fdate(st.a)+' → '+fdate(st.d)+'</span></div><div class="row"><span>'+T("Durée","Length")+'</span><span>'+nn(n)+'</span></div>'+
       '<div class="row"><span>'+T("Voyageurs","Guests")+'</span><span>'+st.ad+' '+T(st.ad>1?"adultes":"adulte",st.ad>1?"adults":"adult")+(st.en?' · '+st.en+' '+T(st.en>1?"enfants":"enfant",st.en>1?"children":"child"):'')+'</span></div>'+
       '<div class="row"><span>'+T("Petit-déjeuner","Breakfast")+'</span><span>'+T("Inclus","Included")+'</span></div>'+
       '<div class="row"><span>Options</span><span>'+(st.options&&st.options.length?esc(st.options.join(" · ")):"—")+'</span></div>'+
+      (isLate(st.options)&&!LG?'<div class="row"><span>'+T("Départ tardif","Late check-out")+'</span><span>+ <span class="px">'+fc(lateFee)+'</span></span></div>':'')+
       '<div class="tot"><span>Total</span><b>'+(LG?T("Sur devis","On quote"):'<span class="px">'+fc(tot)+'</span>')+'</b></div>'+
       (st.back?'<a class="lnk" href="'+esc(st.back)+'">'+T("Modifier ma sélection","Change my selection")+'</a>':'')+'</div>';
     cur(box);

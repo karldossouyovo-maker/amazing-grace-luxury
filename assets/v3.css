@@ -1034,3 +1034,4 @@ dialog.avl::backdrop{background:rgba(16,22,52,.55);backdrop-filter:blur(3px)}
 
 .gemq{min-height:1.4em}
 .gemq:empty{min-height:2.8em}
+@media (min-width:900px){.facts{grid-template-columns:repeat(3,minmax(0,1fr))}}
