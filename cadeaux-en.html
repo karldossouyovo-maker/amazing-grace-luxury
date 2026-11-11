@@ -45,9 +45,9 @@
 <section><div class="wrap vgrid">
   <div class="rv" style="display:grid;gap:26px">
     <h2 style="font-size:clamp(1.6rem,3vw,2.2rem)">How it works</h2>
-    <ol class="steps-l"><li>You design the voucher and send the request.</li><li>Reception sends you the payment details: Mobile Money, card or transfer.</li><li>The voucher is sent to the recipient, or handed over at reception, on the date you choose.</li></ol>
+    <ol class="steps-l"><li>You design the card and confirm it.</li><li>Reception sends you the payment details: Mobile Money, card or transfer.</li><li>The voucher is sent to the recipient, or handed over at reception, on the date you choose.</li></ol>
   </div>
-  <form class="form" id="gform" data-mail action="https://formsubmit.co/liroykd@gmail.com" method="POST" novalidate>
+  <form class="form" id="gform" data-mail data-ajax="gift" action="https://formsubmit.co/liroykd@gmail.com" method="POST" novalidate>
     <input type="hidden" name="_subject" value="Gift voucher request · Amazing Grace Luxury"><input type="hidden" name="_template" value="table"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_cc" value="reception.agrluxury@gmail.com"><input type="hidden" name="_next" value=""><input type="text" name="_honey" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="hidden" name="Langue" value="English"><input type="hidden" name="Bon" id="g-summary">
     <fieldset><legend>The gift</legend>
       <div class="seg" role="group" aria-label="Voucher type"><button type="button" class="gtype" data-gtype="amount" aria-pressed="true">An amount</button><button type="button" class="gtype" data-gtype="nights" aria-pressed="false">Nights</button></div>
@@ -66,8 +66,9 @@
       <div class="fld"><label for="g-tel" class="req">Phone / WhatsApp</label><input type="tel" id="g-tel" name="Téléphone" autocomplete="tel" required></div>
     </div></fieldset>
     <p class="err" role="alert"></p><p class="pv-note" hidden>Preview: sending is turned off here. Once the site is live, the request goes straight to the team by email.</p>
-    <button class="btn" type="submit" style="justify-self:start">Request my gift voucher</button>
-    <p style="font-size:.86rem;color:var(--muted)">Nothing to pay at this stage. The validity period is shown on the voucher.</p>
+    <button class="btn" type="submit" style="justify-self:start">Confirm my gift card</button>
+    <div class="gdone" id="gdone" hidden tabindex="-1" role="status"><span class="gd-ic" aria-hidden="true">✓</span><h3>Your gift card is confirmed</h3><p id="gd-txt"></p><p class="gd-ref"></p><a class="lnk" href="cadeaux-en.html" id="gd-new">Create another card</a></div>
+    <p class="gnote" style="font-size:.86rem;color:var(--muted)">Nothing to pay at this stage. The validity period is shown on the voucher.</p>
   </form>
 </div></section>
 </main>

@@ -183,9 +183,27 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       if(bad.length){e.preventDefault();if(er)er.textContent=T("Merci de compléter les champs obligatoires.","Please fill in the required fields.");bad[0].focus();return}
       if(er)er.textContent="";
       if(f.dataset.before&&window[f.dataset.before])window[f.dataset.before]();
+      if(f.dataset.ajax==="gift"){e.preventDefault();giftDone(f);return}
       if(preview){e.preventDefault();var n=$(".pv-note",f);if(n)n.hidden=false}
     });
   });
+
+  /* carte cadeau : confirmation directe sur la page */
+  function giftDone(f){
+    var btn=$("button[type=submit]",f);if(btn){btn.disabled=true;btn.textContent=T("Confirmation…","Confirming…")}
+    var ch="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",ref="CAD-";for(var i=0;i<6;i++)ref+=ch.charAt(Math.floor(Math.random()*ch.length));
+    var fd=new FormData(f);fd.set("_subject",T("Carte cadeau confirmée ","Gift card confirmed ")+ref+" · Amazing Grace Luxury");fd.append("Référence",ref);fd.delete("_next");
+    var show=function(){
+      var g=$("#gdone");if(!g)return;
+      var who=($("#g-to")||{}).value||"",amt=($("#g-summary")||{}).value||"";
+      $("#gd-txt").textContent=T("Merci ! Votre carte cadeau ","Thank you! Your gift card ")+(amt?"("+amt+") ":"")+T("pour ","for ")+who+T(" est bien enregistrée. La réception vous contacte sous 24 h sur WhatsApp ou par email pour le règlement, puis envoie la carte au bénéficiaire à la date choisie."," is registered. Reception will contact you within 24 hours by WhatsApp or email for payment, then send the card to the recipient on the chosen date.");
+      $(".gd-ref",g).textContent=T("Référence : ","Reference: ")+ref;
+      $$("fieldset,.err,.gnote,.pv-note,button[type=submit]",f).forEach(function(x){x.hidden=true});
+      g.hidden=false;g.scrollIntoView({behavior:"smooth",block:"center"});try{g.focus({preventScroll:true})}catch(x){}
+    };
+    if(preview){show();return}
+    fetch("https://formsubmit.co/ajax/"+(A.mail||"liroykd@gmail.com"),{method:"POST",body:fd,headers:{Accept:"application/json"}}).then(show,show);
+  }
 
   /* ── reservation page ── */
   var rf=$("#rform");

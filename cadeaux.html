@@ -45,9 +45,9 @@
 <section><div class="wrap vgrid">
   <div class="rv" style="display:grid;gap:26px">
     <h2 style="font-size:clamp(1.6rem,3vw,2.2rem)">Comment ça marche</h2>
-    <ol class="steps-l"><li>Vous composez le bon et envoyez la demande.</li><li>La réception vous envoie le moyen de paiement : Mobile Money, carte ou virement.</li><li>Le bon est envoyé au bénéficiaire, ou remis à la réception, à la date choisie.</li></ol>
+    <ol class="steps-l"><li>Vous composez la carte et la confirmez.</li><li>La réception vous envoie le moyen de paiement : Mobile Money, carte ou virement.</li><li>Le bon est envoyé au bénéficiaire, ou remis à la réception, à la date choisie.</li></ol>
   </div>
-  <form class="form" id="gform" data-mail action="https://formsubmit.co/liroykd@gmail.com" method="POST" novalidate>
+  <form class="form" id="gform" data-mail data-ajax="gift" action="https://formsubmit.co/liroykd@gmail.com" method="POST" novalidate>
     <input type="hidden" name="_subject" value="Demande de bon cadeau · Amazing Grace Luxury"><input type="hidden" name="_template" value="table"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_cc" value="reception.agrluxury@gmail.com"><input type="hidden" name="_next" value=""><input type="text" name="_honey" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="hidden" name="Langue" value="Français"><input type="hidden" name="Bon" id="g-summary">
     <fieldset><legend>Le cadeau</legend>
       <div class="seg" role="group" aria-label="Type de bon"><button type="button" class="gtype" data-gtype="amount" aria-pressed="true">Un montant</button><button type="button" class="gtype" data-gtype="nights" aria-pressed="false">Des nuits</button></div>
@@ -66,8 +66,9 @@
       <div class="fld"><label for="g-tel" class="req">Téléphone / WhatsApp</label><input type="tel" id="g-tel" name="Téléphone" autocomplete="tel" required></div>
     </div></fieldset>
     <p class="err" role="alert"></p><p class="pv-note" hidden>Aperçu : l’envoi est désactivé ici. Une fois le site en ligne, la demande part directement par email à l’équipe.</p>
-    <button class="btn" type="submit" style="justify-self:start">Demander mon bon cadeau</button>
-    <p style="font-size:.86rem;color:var(--muted)">Rien n’est à payer à cette étape. La durée de validité est indiquée sur le bon.</p>
+    <button class="btn" type="submit" style="justify-self:start">Confirmer ma carte cadeau</button>
+    <div class="gdone" id="gdone" hidden tabindex="-1" role="status"><span class="gd-ic" aria-hidden="true">✓</span><h3>Votre carte cadeau est confirmée</h3><p id="gd-txt"></p><p class="gd-ref"></p><a class="lnk" href="cadeaux.html" id="gd-new">Créer une autre carte</a></div>
+    <p class="gnote" style="font-size:.86rem;color:var(--muted)">Rien n’est à payer à cette étape. La durée de validité est indiquée sur le bon.</p>
   </form>
 </div></section>
 </main>

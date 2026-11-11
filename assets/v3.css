@@ -1065,3 +1065,20 @@ p,li{text-wrap:pretty}
 img{-webkit-user-drag:none}
 .fld input[type=date]{padding-right:22px;background-position:right 0 center;background-size:16px 16px}
 @media (max-width:700px){.fld input[type=date]{font-size:1.12rem;letter-spacing:-.01em}}
+/* carte cadeau : champ « autre montant » utilisable */
+.amounts .amt-free{grid-column:1/-1;justify-content:center;cursor:text}
+.amounts .amt-free input{position:static;opacity:1;width:170px;height:auto;text-align:center;font:400 1.15rem/1.2 var(--display);color:var(--ink)}
+.amounts .amt-free input:focus{outline:none;border-color:var(--gold-soft);box-shadow:0 0 0 3px rgba(216,179,106,.25)}
+.amounts .amt-free:has(input:not(:placeholder-shown)){border-color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1px var(--ink)}
+@media (min-width:700px){.amounts .amt-free{grid-column:auto/span 4}}
+/* carte cadeau : confirmation */
+.gdone{border:1px solid var(--line);border-radius:var(--r-l,28px);background:#fff;padding:34px 28px;text-align:center;display:grid;gap:12px;justify-items:center;outline:none;animation:gdin .5s ease}
+.gdone[hidden]{display:none!important}
+.gd-ic{width:58px;height:58px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:1.6rem;box-shadow:0 0 0 6px #ecdcb4}
+.gdone h3{font-size:1.7rem}
+.gdone p{max-width:46ch;color:var(--muted)}
+.gd-ref{font-weight:500;letter-spacing:.08em;color:var(--ink)!important}
+@keyframes gdin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.amounts .amt-free{flex-wrap:nowrap;gap:8px;padding:14px 12px}
+.amounts .amt-free input{width:min(150px,38vw);padding:10px 12px}
+.amounts .amt-free span,.amounts .amt-free small{white-space:nowrap;font-size:1rem}
