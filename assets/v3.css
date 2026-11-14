@@ -1196,3 +1196,10 @@ body.has-rbar .wa-f{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 78px
 .bk-acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
 @media print{.hd,.ann,.ft,.wa-f,.wachat,.bk-acts,.crumbs,.rbar{display:none!important}body{background:#fff}}
 .rbar{background:#fff}
+.bk-badge{justify-self:start;font:500 .72rem/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:#1f7a4a;background:#eaf5ee;border:1px solid #cfe6d8;border-radius:999px;padding:7px 11px}
+.bk-info{display:grid;gap:14px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 24px}
+@media (min-width:700px){.bk-info{grid-template-columns:1.4fr 1fr 1fr}}
+.bk-info span{display:block;font:500 .68rem/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bk-info b{display:block;font:400 .95rem/1.4 var(--body);color:var(--ink)}
+.bk-info b a{color:inherit}
+.bk-info div>a{font-size:.85rem;color:var(--gold);text-decoration:underline;text-underline-offset:3px}
