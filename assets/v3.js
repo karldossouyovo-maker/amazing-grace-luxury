@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     var wa='https://wa.me/2290148841111?text='+encodeURIComponent(T("Bonjour, je viens de faire une demande sur le site. Référence : ","Hello, I have just made a request on the website. Reference: ")+it.ref);
     box.classList.add("bk-done-wrap");
     box.innerHTML='<div class="bk-done">'+
-      '<div class="bk-hd"><span class="ok" aria-hidden="true">✓</span><div><h2>'+title+'</h2><p>'+lead+(it.email?' '+T("Un récapitulatif part à ","A summary is on its way to ")+'<b>'+esc(it.email)+'</b>.':'')+'</p></div></div>'+
+      '<div class="bk-hd"><span class="ok" aria-hidden="true">✓</span><div><h2>'+title+'</h2><p>'+lead+(it.email?' '+T("Un e-mail de confirmation vous a été envoyé à ","A confirmation email has been sent to ")+'<b>'+esc(it.email)+'</b>.':'')+'</p></div></div>'+
       '<div class="bk-card">'+(img?'<div class="bk-img">'+img+'</div>':'')+
         '<div class="bk-b"><div class="bk-ref"><span>'+T("Référence","Reference")+'</span><b>'+esc(it.ref)+'</b></div>'+(!dv&&!dem?'<span class="bk-badge">✓ '+T("Confirmée","Confirmed")+'</span>':'')+
         '<h3>'+names+'</h3>'+
