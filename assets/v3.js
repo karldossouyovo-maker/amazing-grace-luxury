@@ -416,26 +416,23 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   var norm=function(x){return String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")};
   var saved="BJ";try{saved=localStorage.getItem("agr-cc")||"BJ"}catch(e){}
   var byCode=function(k){return C.filter(function(c){return c[0]===k})[0]||C[0]};
-  var dlg=null,cb=null,cur="BJ";
+  var pop=null,cb=null,cur="BJ",host=null;
   function build(){
-    dlg=document.createElement("dialog");dlg.className="cc-dlg";dlg.setAttribute("aria-label",EN?"Choose your country":"Choisissez votre pays");
-    dlg.innerHTML='<div class="cc-hd"><h3>'+(EN?"Country code":"Indicatif du pays")+'</h3><button type="button" class="rp-x cc-x" aria-label="'+(EN?"Close":"Fermer")+'">✕</button></div>'+
-      '<div class="cc-s"><input type="search" class="cc-q" placeholder="'+(EN?"Search a country or a code (e.g. France, +33)":"Rechercher un pays ou un indicatif (ex. France, +33)")+'" autocomplete="off" aria-label="'+(EN?"Search":"Rechercher")+'"></div>'+
-      '<ul class="cc-l" role="listbox"></ul>';
-    document.body.appendChild(dlg);
-    var q=dlg.querySelector(".cc-q"),ul=dlg.querySelector(".cc-l");
+    pop=document.createElement("div");pop.className="cc-pop";pop.hidden=true;
+    pop.innerHTML='<input type="search" class="cc-q" placeholder="'+(EN?"Search a country":"Rechercher un pays")+'" autocomplete="off" aria-label="'+(EN?"Search":"Rechercher")+'"><ul class="cc-l" role="listbox"></ul>';
+    var q=pop.querySelector(".cc-q"),ul=pop.querySelector(".cc-l");
     function list(){var t=norm(q.value.trim()).replace(/^00/,"+"),d=t.replace(/[^0-9]/g,"");
       var r=C.filter(function(c){return !t||norm(c[2]).indexOf(t)>=0||norm(c[3]).indexOf(t)>=0||(d&&c[4].indexOf(d)===0)||norm(c[0])===t});
       ul.innerHTML=r.length?r.map(function(c){return '<li><button type="button" data-k="'+c[0]+'" class="'+(c[0]===cur?"on":"")+'"><span class="f">'+c[1]+'</span><span class="n">'+(EN?c[3]:c[2])+'</span><span class="c">+'+c[4]+'</span></button></li>'}).join(""):'<li class="cc-none">'+(EN?"No country found":"Aucun pays trouvé")+'</li>'}
     q.addEventListener("input",list);
-    q.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();var f=ul.querySelector("button");if(f)f.click()}});
-    dlg.addEventListener("click",function(e){if(e.target===dlg||e.target.closest(".cc-x")){close();return}var b=e.target.closest("button[data-k]");if(b&&cb){cb(b.dataset.k);close()}});
-    dlg.addEventListener("cancel",function(){document.documentElement.classList.remove("rp-lock")});
-    dlg._list=list;
+    q.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();var f=ul.querySelector("button");if(f)f.click()}if(e.key==="Escape")close()});
+    pop.addEventListener("click",function(e){var b=e.target.closest("button[data-k]");if(b&&cb){cb(b.dataset.k);close()}});
+    document.addEventListener("click",function(e){if(!pop.hidden&&!pop.contains(e.target)&&!(host&&host.contains(e.target)))close()});
+    pop._list=list;
   }
-  function open(k,fn){if(!dlg)build();cur=k;cb=fn;var q=dlg.querySelector(".cc-q");q.value="";dlg._list();document.documentElement.classList.add("rp-lock");
-    if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");setTimeout(function(){if(window.innerWidth>700)q.focus();var on=dlg.querySelector("button.on");if(on)on.scrollIntoView({block:"center"})},60)}
-  function close(){document.documentElement.classList.remove("rp-lock");if(dlg.close)dlg.close();else dlg.removeAttribute("open")}
+  function open(k,fn,w){if(!pop)build();if(!pop.hidden&&host===w){close();return}cur=k;cb=fn;host=w;w.appendChild(pop);var q=pop.querySelector(".cc-q");q.value="";pop._list();pop.hidden=false;w.classList.add("open");
+    setTimeout(function(){try{q.focus({preventScroll:true})}catch(x){q.focus()}var on=pop.querySelector("button.on");if(on)on.scrollIntoView({block:"nearest"})},30)}
+  function close(){if(!pop)return;pop.hidden=true;if(host)host.classList.remove("open")}
   [].slice.call(document.querySelectorAll('input[type=tel]')).forEach(function(inp){
     if(inp.dataset.cc)return;inp.dataset.cc="1";
     var w=document.createElement("div");w.className="telcc";
@@ -444,7 +441,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     var k=saved;
     function show(){var c=byCode(k);b.innerHTML='<span class="f">'+c[1]+'</span> +'+c[4];b.setAttribute("aria-label",(EN?"Country code: ":"Indicatif : ")+(EN?c[3]:c[2])+" +"+c[4])}
     function set(x){k=x;show();try{localStorage.setItem("agr-cc",x)}catch(e){}saved=x;inp.focus()}
-    b.addEventListener("click",function(){open(k,set)});show();
+    b.addEventListener("click",function(e){e.stopPropagation();open(k,set,w)});show();
     inp.addEventListener("input",function(){var v=inp.value.replace(/\s/g,"");if(v.charAt(0)==="+"){var m=C.filter(function(c){return v.indexOf("+"+c[4])===0}).sort(function(a,b2){return b2[4].length-a[4].length})[0];if(m&&m[4]!==byCode(k)[4]){k=m[0];show()}}});
     inp._cc=function(){var v=inp.value.trim();if(!v||v.charAt(0)==="+")return;if(v.indexOf("00")===0){inp.value="+"+v.slice(2);return}inp.value="+"+byCode(k)[4]+" "+v};
   });

@@ -1250,3 +1250,16 @@ body.has-rbar .wa-f{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 78px
 .cc-l .n{flex:1;font:400 1rem/1.2 var(--body)}
 .cc-l .c{font:500 .95rem/1 var(--body);color:var(--muted);font-variant-numeric:tabular-nums}
 .cc-none{padding:20px;text-align:center;color:var(--muted)}
+/* indicatif : liste déroulante compacte avec recherche (remplace la grande fenêtre) */
+.cc-dlg{display:none!important}
+.telcc{position:relative}
+.cc-pop{position:absolute;left:0;top:calc(100% + 6px);z-index:40;width:min(320px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(20,25,60,.16);padding:8px;display:grid;gap:6px}
+.cc-pop[hidden]{display:none!important}
+.cc-pop .cc-q{padding:10px 12px 10px 36px;background-position:11px center;background-size:16px 16px;border-radius:10px;font-size:16px}
+.cc-pop .cc-l{max-height:230px;padding:0;margin:0}
+.cc-pop .cc-l button{padding:9px 10px;border-radius:10px}
+.cc-pop .cc-l button:hover,.cc-pop .cc-l button.on{background:#f7f3ec;box-shadow:none}
+.cc-pop .cc-l .f{font-size:1.1rem}.cc-pop .cc-l .n{font-size:.95rem}.cc-pop .cc-l .c{font-size:.88rem}
+.cc-pop .cc-none{padding:12px}
+.telcc.open .cc-btn{border-color:var(--gold-soft)}
+.fld:has(.cc-pop:not([hidden])){position:relative;z-index:30;overflow:visible}
