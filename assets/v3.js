@@ -514,7 +514,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     var names=(it.rooms||[]).map(function(id){return esc(byId[id].n)}).concat((it.cats||[]).map(function(c){return T("Sans préférence · ","No preference · ")+esc(c)})).join(" + ");
     var pre=String(it.nom||"").trim().split(/\s+/)[0];
     var title=dv?T("Demande de devis envoyée","Quote request sent"):dem?T("Demande de réservation envoyée","Booking request sent"):T("Réservation confirmée","Booking confirmed");
-    var lead=(pre?T("Merci ","Thank you ")+esc(pre)+" ! ":T("Merci ! ","Thank you! "))+(dv?T("Notre équipe évalue le tarif de votre séjour.","Our team is pricing your stay."):dem?T("Votre demande est bien arrivée à la réception.","Your request has reached reception."):T("Votre séjour à Amazing Grace Luxury est confirmé. À très bientôt à Cotonou !","Your stay at Amazing Grace Luxury is confirmed. See you soon in Cotonou!"));
+    var lead=(pre?T("Merci ","Thank you ")+esc(pre)+" ! ":T("Merci ! ","Thank you! "))+(dv?T("Notre équipe évalue le tarif de votre séjour.","Our team is pricing your stay."):dem?T("Votre demande est bien arrivée à la réception.","Your request has reached reception."):T("Votre séjour dans notre établissement est confirmé. À très bientôt chez Amazing Grace Luxury !","Your stay with us is confirmed. See you very soon at Amazing Grace Luxury!"));
     function day(d){var p=d.split("-"),dt=new Date(+p[0],+p[1]-1,+p[2]);return '<b>'+dt.toLocaleDateString(EN?"en-GB":"fr-FR",{weekday:"short",day:"numeric",month:"short",year:"numeric"})+'</b>'}
     var opts=(it.options||[]).length?esc(it.options.join(" · ")):"—";
     var img=first&&(first.img||first.th)?'<img src="assets/img/'+(first.img||first.th)+'" alt="">':'';
