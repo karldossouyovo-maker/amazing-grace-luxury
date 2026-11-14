@@ -489,7 +489,6 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     if(tot!=null&&isLate(o.options))tot+=Math.round(o.picks.reduce(function(s,p){var r=p.room?byId[p.room]:R.filter(function(x){return x.cat===p.cat&&!UNITS[x.id]&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];return s+(r&&r.p||0)},0)/2);
     var it={ref:ref,rooms:ids,cats:cats,a:o.a,d:o.d,nuits:n,adultes:o.ad,enfants:o.en,total:tot,options:o.options,nom:o.who.nom,tel:o.who.tel,email:o.who.email,msg:o.who.msg,st:LG?"devis":"demande"};
     var b=new FormData();b.append("_subject",(LG?"Demande de devis ":"Demande de réservation ")+ref+" · Amazing Grace Luxury");b.append("_template","table");b.append("_captcha","false");
-    b.append("_cc","reception.agrluxury@gmail.com");
     [["Référence",ref],["Chambres",ids.map(function(id){return byId[id].n}).concat(cats.map(function(c){return T("Catégorie ","Category ")+c})).join(" + ")],["Arrivée",o.a],["Départ",o.d],["Nuits",n],["Adultes",o.ad],["Enfants",o.en],["Total estimé",tot==null?"Sur devis":fc(tot)],["Options",(o.options||[]).join(" ; ")],["Nom",o.who.nom],["Téléphone",o.who.tel],["email",o.who.email],["Message",o.who.msg]].forEach(function(x){b.append(x[0],x[1]==null?"":x[1])});
     return fetch("https://formsubmit.co/ajax/"+(A.mail||"liroykd@gmail.com"),{method:"POST",body:b,headers:{Accept:"application/json"}}).then(function(r){if(!r.ok)throw {};return it});
   };
