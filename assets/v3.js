@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     var f=e.target.closest&&e.target.closest(".fld");
     if(!f||e.target.closest("input,select,textarea,a,button"))return;
     var rb=f.querySelector(".rp-btn");if(rb){rb.click();return}
-    var c=f.querySelector("select,input:not([type=hidden]):not([type=checkbox]),textarea");
+    var c=f.querySelector("select:not(.cc),input:not([type=hidden]):not([type=checkbox]),textarea");
     if(!c)return;
     c.focus();
     if(c.showPicker&&(c.tagName==="SELECT"||c.type==="date")){try{c.showPicker()}catch(x){}}
@@ -407,6 +407,27 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   if(hd)new IntersectionObserver(function(e){past=!e[0].isIntersecting;upd()}).observe(hd);else past=true;
   window.addEventListener("resize",upd);
   bar.querySelector("a").addEventListener("click",function(e){e.preventDefault();f.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){var d=document.getElementById("rb-in");if(d&&!d.value)try{d.focus({preventScroll:true})}catch(x){}},500)});
+})();
+
+/* Indicatif pays devant chaque champ téléphone */
+(function(){
+  var EN=(window.AGR||{}).lang==="en";
+  var C=[["BJ","🇧🇯","Bénin","Benin","229"],["TG","🇹🇬","Togo","Togo","228"],["NG","🇳🇬","Nigeria","Nigeria","234"],["CI","🇨🇮","Côte d’Ivoire","Côte d’Ivoire","225"],["BF","🇧🇫","Burkina Faso","Burkina Faso","226"],["NE","🇳🇪","Niger","Niger","227"],["SN","🇸🇳","Sénégal","Senegal","221"],["ML","🇲🇱","Mali","Mali","223"],["GH","🇬🇭","Ghana","Ghana","233"],["GN","🇬🇳","Guinée","Guinea","224"],["CM","🇨🇲","Cameroun","Cameroon","237"],["GA","🇬🇦","Gabon","Gabon","241"],["CG","🇨🇬","Congo","Congo","242"],["CD","🇨🇩","RD Congo","DR Congo","243"],["MA","🇲🇦","Maroc","Morocco","212"],["TN","🇹🇳","Tunisie","Tunisia","216"],["DZ","🇩🇿","Algérie","Algeria","213"],["ZA","🇿🇦","Afrique du Sud","South Africa","27"],["FR","🇫🇷","France","France","33"],["BE","🇧🇪","Belgique","Belgium","32"],["CH","🇨🇭","Suisse","Switzerland","41"],["LU","🇱🇺","Luxembourg","Luxembourg","352"],["DE","🇩🇪","Allemagne","Germany","49"],["IT","🇮🇹","Italie","Italy","39"],["ES","🇪🇸","Espagne","Spain","34"],["PT","🇵🇹","Portugal","Portugal","351"],["NL","🇳🇱","Pays-Bas","Netherlands","31"],["GB","🇬🇧","Royaume-Uni","United Kingdom","44"],["IE","🇮🇪","Irlande","Ireland","353"],["US","🇺🇸","États-Unis","United States","1"],["CA","🇨🇦","Canada","Canada","1"],["BR","🇧🇷","Brésil","Brazil","55"],["AE","🇦🇪","Émirats arabes unis","United Arab Emirates","971"],["SA","🇸🇦","Arabie saoudite","Saudi Arabia","966"],["LB","🇱🇧","Liban","Lebanon","961"],["TR","🇹🇷","Turquie","Türkiye","90"],["CN","🇨🇳","Chine","China","86"],["IN","🇮🇳","Inde","India","91"],["JP","🇯🇵","Japon","Japan","81"]];
+  var saved="BJ";try{saved=localStorage.getItem("agr-cc")||"BJ"}catch(e){}
+  [].slice.call(document.querySelectorAll('input[type=tel]')).forEach(function(inp){
+    if(inp.dataset.cc)return;inp.dataset.cc="1";
+    var w=document.createElement("div");w.className="telcc";
+    var s=document.createElement("select");s.className="cc";s.setAttribute("aria-label",EN?"Country code":"Indicatif du pays");
+    s.innerHTML=C.map(function(c){return '<option value="'+c[0]+'" data-code="+'+c[4]+'">'+c[1]+' +'+c[4]+' · '+(EN?c[3]:c[2])+'</option>'}).join("");
+    s.value=saved;
+    inp.parentNode.insertBefore(w,inp);w.appendChild(s);w.appendChild(inp);
+    var lab=document.createElement("span");lab.className="cc-show";w.insertBefore(lab,s);
+    function show(){var o=s.options[s.selectedIndex];lab.textContent=o?o.text.split(" · ")[0]:"";requestAnimationFrame(function(){s.style.width=lab.offsetWidth+"px"})}
+    s.addEventListener("change",function(){show();try{localStorage.setItem("agr-cc",s.value)}catch(e){}inp.focus()});show();
+    inp.addEventListener("input",function(){var v=inp.value.trim();if(v.charAt(0)==="+"){var m=C.filter(function(c){return v.replace(/\s/g,"").indexOf("+"+c[4])===0}).sort(function(a,b){return b[4].length-a[4].length})[0];if(m&&m[0]!==s.value&&!(m[4]==="1"&&s.value==="CA")){s.value=m[0];show()}}});
+    inp._cc=function(){var v=inp.value.trim();if(!v||v.charAt(0)==="+")return;if(v.indexOf("00")===0){inp.value="+"+v.slice(2);return}var code=s.options[s.selectedIndex].getAttribute("data-code");inp.value=code+" "+v};
+  });
+  document.addEventListener("submit",function(e){[].slice.call(e.target.querySelectorAll('input[type=tel]')).forEach(function(i){if(i._cc)i._cc()})},true);
 })();
 
 /* ── Réservation instantanée : page « Chambres disponibles » + page Réserver ── */
