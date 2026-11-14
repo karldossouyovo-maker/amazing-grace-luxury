@@ -1284,3 +1284,18 @@ body.has-rbar .wa-f{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 78px
 .rbook .curb{margin:-6px 0 4px}
 .recap .curb{margin:0 0 6px}
 #co-wrap,#cf-wrap{margin-top:6px}
+
+/* ===== Annulation : motif + réserver à nouveau ===== */
+.gm-free{margin:0;color:#1f7a4a;font-weight:500}
+#gm-ann .fld{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+#gm-ann .fld[hidden]{display:none}
+#gm-ann textarea{width:100%;border:0;background:transparent;font:inherit;color:var(--ink);resize:vertical;outline:none;margin-top:6px}
+.gm-sm{font-size:.86rem;color:var(--muted);margin:0}
+.gm-rebook{display:grid;gap:16px;background:var(--ink);color:#fff;border-radius:22px;padding:26px 26px}
+.gm-rebook .kick{color:var(--gold-soft)}
+.gm-rebook h3{color:#fff;font-size:1.8rem;margin:4px 0 6px}
+.gm-rebook h3 em{color:var(--gold-soft)}
+.gm-rebook p{color:#d7dbee;margin:0}
+.gm-rebook .btn{background:#fff;color:var(--ink);border-color:#fff}
+.gm-rebook .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.gm-rebook .btn:hover{background:var(--gold);border-color:var(--gold);color:#fff}
