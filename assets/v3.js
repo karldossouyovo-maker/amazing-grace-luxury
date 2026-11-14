@@ -272,6 +272,59 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
 
   /* ── reveal on scroll ── */
   if("IntersectionObserver" in window&&!reduce){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}})},{rootMargin:"0px 0px -8% 0px"});$$(".rv").forEach(function(el){io.observe(el)})}else{$$(".rv").forEach(function(el){el.classList.add("in")})}
+  /* ── sélecteur de chambre en cartes (remplace la liste du téléphone) ── */
+  function roomPicker(sel){
+    if(!sel||sel.dataset.rp)return;sel.dataset.rp="1";
+    var fld=sel.closest(".fld")||sel.parentNode;fld.classList.add("rp-fld");
+    sel.classList.add("rp-native");sel.tabIndex=-1;sel.setAttribute("aria-hidden","true");
+    var btn=document.createElement("button");btn.type="button";btn.className="rp-btn";btn.setAttribute("aria-haspopup","dialog");
+    sel.parentNode.insertBefore(btn,sel.nextSibling);
+    var lab=fld.querySelector("label");if(lab&&lab.htmlFor===sel.id){lab.htmlFor="";lab.addEventListener("click",function(e){e.preventDefault();open()})}
+    var esc2=function(x){return String(x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+    function thumb(r){return r&&r.th?'<img src="assets/img/'+r.th+'" alt="" loading="lazy">':'<i style="background:'+(r?r.dot:"#d8b36a")+'"></i>'}
+    function price(r,from){return r&&r.p!=null?'<span class="px">'+(from?T("dès ","from "):"")+fc(r.p)+'</span>':'<span>'+T("Sur demande","On request")+'</span>'}
+    function render(){
+      var v=sel.value,r=byId[v],c=v.indexOf("cat:")===0?v.slice(4):null;
+      if(r)btn.innerHTML='<span class="rp-th">'+thumb(r)+'</span><span class="rp-t"><b>'+esc2(r.n)+'</b><small>'+esc2(r.cat)+' · '+price(r)+T(" / nuit"," / night")+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>';
+      else if(c){var cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(a,b){return a.p-b.p})[0];btn.innerHTML='<span class="rp-th">'+thumb(cr)+'</span><span class="rp-t"><b>'+T("Une chambre ","Any ")+esc2(c.toLowerCase())+'</b><small>'+T("La plus belle libre · ","Best available · ")+price(cr,1)+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>'}
+      else btn.innerHTML='<span class="rp-t rp-ph">'+T("Choisir une chambre","Choose a room")+'</span><span class="rp-ch">'+T("Voir les chambres","See the rooms")+'</span>';
+      if(window.AGRcur)window.AGRcur.apply(btn);
+    }
+    var dlg;
+    function build(){
+      dlg=document.createElement("dialog");dlg.className="rp-dlg";dlg.setAttribute("aria-label",T("Choisissez votre chambre","Choose your room"));
+      var opts=[].slice.call(sel.options).filter(function(o){return o.value&&!o.disabled}),cats=[],rooms=opts.filter(function(o){return byId[o.value]}),catOpts=opts.filter(function(o){return o.value.indexOf("cat:")===0});
+      rooms.forEach(function(o){var c=byId[o.value].cat;if(cats.indexOf(c)<0)cats.push(c)});
+      var h='<div class="rp-hd"><h3>'+T("Choisissez votre chambre","Choose your room")+'</h3><button type="button" class="rp-x" aria-label="'+T("Fermer","Close")+'">✕</button></div><div class="rp-body">';
+      cats.forEach(function(c){
+        h+='<p class="rp-cat">'+esc2(c)+'</p>';
+        rooms.filter(function(o){return byId[o.value].cat===c}).forEach(function(o){var r=byId[o.value];
+          h+='<button type="button" class="rp-it" data-v="'+esc2(o.value)+'"><span class="rp-th">'+thumb(r)+'</span><span class="rp-t"><b>'+esc2(r.n)+(r.sea?' <em class="rp-sea">'+T("Vue mer","Sea view")+'</em>':'')+'</b><small>'+esc2(r.at||"")+'</small></span><span class="rp-p">'+price(r)+'<small>'+T("/ nuit","/ night")+'</small></span></button>'});
+      });
+      if(catOpts.length){h+='<p class="rp-cat">'+T("Ou laissez-nous choisir","Or let us choose")+'</p>';
+        catOpts.forEach(function(o){var c=o.value.slice(4),cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(a,b){return a.p-b.p})[0];
+          h+='<button type="button" class="rp-it rp-any" data-v="'+esc2(o.value)+'"><span class="rp-th">'+thumb(cr)+'</span><span class="rp-t"><b>'+T("Une chambre ","Any ")+esc2(c.toLowerCase())+'</b><small>'+T("Nous vous attribuons la plus belle libre","We give you the finest one available")+'</small></span><span class="rp-p">'+price(cr,1)+'</span></button>'})}
+      h+='</div>';dlg.innerHTML=h;document.body.appendChild(dlg);
+      dlg.addEventListener("click",function(e){
+        if(e.target===dlg||e.target.closest(".rp-x")){close();return}
+        var it=e.target.closest(".rp-it");if(!it)return;
+        sel.value=it.dataset.v;sel.dispatchEvent(new Event("change",{bubbles:true}));sel.dispatchEvent(new Event("input",{bubbles:true}));render();close();
+      });
+      dlg.addEventListener("cancel",function(){document.documentElement.classList.remove("rp-lock")});
+    }
+    function open(){if(!dlg)build();$$(".rp-it",dlg).forEach(function(b){b.classList.toggle("on",b.dataset.v===sel.value);b.setAttribute("aria-pressed",b.dataset.v===sel.value)});
+      if(window.AGRcur)window.AGRcur.apply(dlg);
+      document.documentElement.classList.add("rp-lock");if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");
+      var on=$(".rp-it.on",dlg);if(on)on.scrollIntoView({block:"center"});}
+    function close(){document.documentElement.classList.remove("rp-lock");if(dlg.close)dlg.close();else dlg.removeAttribute("open");btn.focus()}
+    btn.addEventListener("click",open);
+    sel.addEventListener("change",render);
+    sel.addEventListener("invalid",function(){btn.classList.add("rp-bad")});
+    render();
+    document.addEventListener("agr-cur",render);
+  }
+  roomPicker($("#f-room"));roomPicker($("#g-room"));
+
 })();
 
 /* bandeau d’annonce : messages en alternance */
@@ -328,6 +381,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   document.addEventListener("click",function(e){
     var f=e.target.closest&&e.target.closest(".fld");
     if(!f||e.target.closest("input,select,textarea,a,button"))return;
+    var rb=f.querySelector(".rp-btn");if(rb){rb.click();return}
     var c=f.querySelector("select,input:not([type=hidden]):not([type=checkbox]),textarea");
     if(!c)return;
     c.focus();
