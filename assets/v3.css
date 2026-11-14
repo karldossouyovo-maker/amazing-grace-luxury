@@ -1299,3 +1299,4 @@ body.has-rbar .wa-f{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 78px
 .gm-rebook .btn{background:#fff;color:var(--ink);border-color:#fff}
 .gm-rebook .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
 .gm-rebook .btn:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.rf-acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center}.rf-acts .btn[hidden]{display:none}

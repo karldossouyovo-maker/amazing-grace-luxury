@@ -218,6 +218,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       if(!(n>0))n=0;
       var opts=$$(".opts input:checked").map(function(i){return i.dataset.opt});
       var hol=n>=7&&a<new Date("2027-01-10T12:00")&&b>new Date("2026-12-15T12:00");
+      var see=$("#f-see");if(see){if(r&&!cat){see.href=r.url;see.textContent=T("Voir la chambre","View the room");see.hidden=false}else if(cat){see.href=(EN?"chambres-en.html":"chambres.html");see.textContent=T("Voir les chambres","View the rooms");see.hidden=false}else see.hidden=true}
       $("#rc-img").innerHTML=r&&r.img?'<img src="assets/img/'+r.img+'" alt="">':'';
       $("#rc-cat").textContent=r?r.cat:T("Chambre à choisir","Room to choose");$("#rc-name").textContent=cat?T("Une chambre ","Any ")+cat.toLowerCase()+T(" libre"," available"):(r?r.n:T("Choisissez une chambre","Choose a room"));
       var fmt=function(d){return isNaN(d)?"—":d.toLocaleDateString(EN?"en-GB":"fr-FR",{day:"numeric",month:"short",year:"numeric"})};
