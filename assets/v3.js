@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
 /* ── devise d’affichage (indicatif) ── */
 (function(){
   var RATES={XOF:1,EUR:655.957,USD:570,GBP:765,CAD:415,CHF:700};
-  var EN=(window.AGR||{}).lang==="en",sel=document.getElementById("cur"),code="XOF";
+  var EN=(window.AGR||{}).lang==="en",sels=[].slice.call(document.querySelectorAll("select.cur")),code="XOF";
   try{code=localStorage.getItem("agr-cur")||"XOF"}catch(e){}
   if(!RATES[code])code="XOF";
   var RX=/(\d{1,3}(?:[   ,]\d{3})+|\d+)\s?FCFA/g;
@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     document.documentElement.classList.toggle("cur-x",code!=="XOF");
   }
   window.AGRcur={apply:function(root){root=root||document.body;wrap(root);show(root)}};
-  if(sel){sel.value=code;sel.addEventListener("change",function(){code=sel.value;try{localStorage.setItem("agr-cur",code)}catch(e){}show(document)})}
+  sels.forEach(function(sel){sel.value=code;sel.addEventListener("change",function(){code=sel.value;sels.forEach(function(o){o.value=code});try{localStorage.setItem("agr-cur",code)}catch(e){}show(document)})});
   function go(){window.AGRcur.apply(document.body)}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",go);else go();
   setTimeout(go,1200);
