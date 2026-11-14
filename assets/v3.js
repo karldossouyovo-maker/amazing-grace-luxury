@@ -534,7 +534,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         '<div class="bk-tot"><span>Total</span><div>'+tot+'</div></div></div></div>'+
       '<div class="bk-info"><div><span>'+T("Adresse","Address")+'</span><b>Maison 671, rue de la Banque Atlantique, derrière Marie Stella, Cotonou</b><a href="https://maps.app.goo.gl/ydErPyaEkSBJuHGg7" target="_blank" rel="noopener">'+T("Voir l’itinéraire","Get directions")+'</a></div><div><span>'+T("Réception 24 h/24","24-hour reception")+'</span><b><a href="tel:+2290148841111">+229 01 48 84 11 11</a></b><a href="'+wa+'" target="_blank" rel="noopener">WhatsApp</a></div><div><span>'+T("Paiement","Payment")+'</span><b>'+(dv?T("Selon le devis","As per the quote"):T("Aucun prépaiement : vous réglez sur place","No prepayment: pay at the property"))+'</b></div></div>'+
       '<div class="bk-next"><h3>'+T("Et maintenant ?","What happens next?")+'</h3><ol>'+steps.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ol></div>'+
-      '<div class="bk-acts"><a class="btn" target="_blank" rel="noopener" href="'+wa+'">'+T("Écrire à la réception","Message reception")+'</a>'+(!dv&&!dem?'<a class="btn ghost" id="bk-ics" download="amazing-grace-'+esc(it.ref)+'.ics" href="#">'+T("Ajouter à mon agenda","Add to my calendar")+'</a>':'')+'<button type="button" class="btn ghost" onclick="window.print()">'+T("Imprimer / enregistrer","Print / save")+'</button><a class="lnk" href="'+(EN?"index-en.html":"index.html")+'">'+T("Retour à l’accueil","Back to home")+'</a></div>'+
+      '<div class="bk-acts">'+(SHEET&&!dem?'<a class="btn ghost" href="'+(A.gerer||"gerer.html")+'?ref='+encodeURIComponent(it.ref)+'">'+T("Gérer ma réservation","Manage my booking")+'</a>':'')+'<a class="btn" target="_blank" rel="noopener" href="'+wa+'">'+T("Écrire à la réception","Message reception")+'</a>'+(!dv&&!dem?'<a class="btn ghost" id="bk-ics" download="amazing-grace-'+esc(it.ref)+'.ics" href="#">'+T("Ajouter à mon agenda","Add to my calendar")+'</a>':'')+'<button type="button" class="btn ghost" onclick="window.print()">'+T("Imprimer / enregistrer","Print / save")+'</button><a class="lnk" href="'+(EN?"index-en.html":"index.html")+'">'+T("Retour à l’accueil","Back to home")+'</a></div>'+
     '</div>';
     var ics=$("#bk-ics",box);if(ics){var z=function(d){return d.replace(/-/g,"")};var bl=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Amazing Grace Luxury//FR","BEGIN:VEVENT","UID:"+it.ref+"@amazinggrace","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z","DTSTART;VALUE=DATE:"+z(it.a),"DTEND;VALUE=DATE:"+z(it.d),"SUMMARY:Amazing Grace Luxury - "+names.replace(/<[^>]*>/g,""),"LOCATION:Maison 671 rue de la Banque Atlantique Cotonou","DESCRIPTION:"+T("Référence ","Reference ")+it.ref+" - +229 01 48 84 11 11","END:VEVENT","END:VCALENDAR"].join("\r\n");ics.href="data:text/calendar;charset=utf-8,"+encodeURIComponent(bl)}
     var sec=box.closest("section");if(sec)$$(".kick,h1,.res-help",sec).forEach(function(x){if(!box.contains(x))x.hidden=true});
@@ -698,7 +698,60 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       (api.ready?api.book:api.request)({picks:st.picks,a:st.a,d:st.d,ad:st.ad,en:st.en,options:st.options,who:{nom:nom,tel:f.tel.value.trim(),email:f.email.value.trim(),msg:msg}})
         .then(function(it){try{sessionStorage.removeItem("agr-sel")}catch(e){}api.done($("#co-wrap"),Object.assign({nom:nom,email:f.email.value.trim()},it,{nom:it.nom||nom,email:it.email||f.email.value.trim()}))},function(e2){go.disabled=false;go.textContent=lbl;err.innerHTML=errMsg(e2)+(e2&&e2.taken?' <a href="'+A.avail+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Voir les chambres libres","See available rooms")+'</a>':'')})});
   }
-  function start(){results();resvPage();roomPage();optPage();coordPage()}
+  /* ===== page « Gérer ma réservation » ===== */
+  function gererPage(){
+    var f=$("#gm-f"),out=$("#gm-res");if(!f||!out)return;
+    var q=new URLSearchParams(location.search);if(q.get("ref"))f.ref.value=q.get("ref").toUpperCase();
+    var err=$("#gm-err"),cur0=null,em="";
+    if(!SHEET){err.innerHTML=T("La gestion en ligne est disponible sur le site officiel. Ici, écrivez à la réception : ","Online management is available on the official site. Here, please message reception: ")+'<a href="https://wa.me/2290148841111" target="_blank" rel="noopener">WhatsApp</a>';}
+    function post(b){b.lang=A.lang;return fetch(SHEET,{method:"POST",body:JSON.stringify(b),headers:{"Content-Type":"text/plain;charset=utf-8"}}).then(function(r){return r.json()})}
+    function msgOf(j){var e=j&&j.error;return e==="introuvable"?T("Aucune réservation ne correspond à cette référence et à cet email. Vérifiez-les dans votre email de confirmation.","No booking matches this reference and email. Please check them in your confirmation email."):
+      e==="delai"?T("Votre arrivée est dans moins de "+(j.delai||A.delai)+" h : la modification et l’annulation en ligne ne sont plus possibles. Contactez la réception.","Your arrival is less than "+(j.delai||A.delai)+" h away: online changes and cancellation are no longer possible. Please contact reception."):
+      e==="pris"?T("La chambre n’est pas libre à ces nouvelles dates. Essayez d’autres dates.","The room is not available for these new dates. Please try other dates."):
+      e==="deja"?T("Cette réservation est déjà annulée.","This booking is already cancelled."):
+      e==="dates"?T("Choisissez une date de départ après la date d’arrivée.","Choose a check-out date after the check-in date."):
+      T("Une erreur est survenue. Réessayez ou écrivez à la réception sur WhatsApp.","Something went wrong. Try again or message reception on WhatsApp.")}
+    function idsOf(r){return r.sweet?["sweet-home"]:(r.ids||[]).filter(function(i){return byId[i]})}
+    function priceTot(r,a,d){var n=nights(a,d),ids=idsOf(r),p=ids.reduce(function(s,i){return s+(byId[i]&&byId[i].p||0)},0);if(!p)return "";var late=/tardif|late/i.test(r.options||"");return fc(p*n+(late?Math.round(p/2):0))}
+    function day(d){var p=d.split("-"),dt=new Date(+p[0],+p[1]-1,+p[2]);return dt.toLocaleDateString(EN?"en-GB":"fr-FR",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}
+    function render(j,note){
+      var r=j.resa,ann=r.statut==="Annulée",tard=j.tard,first=byId[idsOf(r)[0]],img=first&&(first.img||first.th);
+      var badge=ann?'<span class="bk-badge gm-off">'+T("Annulée","Cancelled")+'</span>':'<span class="bk-badge">✓ '+esc(r.statut==="Demande de devis"?T("Demande de devis","Quote request"):T("Confirmée","Confirmed"))+'</span>';
+      var h=(note?'<div class="bk-hd'+(ann?' gm-hd-off':'')+'"><span class="ok" aria-hidden="true">✓</span><div><h2>'+note[0]+'</h2><p>'+note[1]+'</p></div></div>':'')+
+        '<div class="bk-card">'+(img?'<div class="bk-img"><img src="assets/img/'+img+'" alt=""></div>':'')+'<div class="bk-b"><div class="bk-ref"><span>'+T("Référence","Reference")+'</span><b>'+esc(r.ref)+'</b></div>'+badge+
+        '<h3>'+esc(r.chambres.join(" + "))+'</h3><div class="bk-dates"><div><span>'+T("Arrivée","Check-in")+'</span><b>'+day(r.a)+'</b></div><i aria-hidden="true">→</i><div><span>'+T("Départ","Check-out")+'</span><b>'+day(r.d)+'</b></div></div>'+
+        '<div class="bk-rows"><div><span>'+T("Durée","Length")+'</span><b>'+nn(nights(r.a,r.d))+'</b></div><div><span>'+T("Voyageurs","Guests")+'</span><b>'+esc(r.voyageurs||"—")+'</b></div><div class="w"><span>Options</span><b>'+esc(r.options||"—")+'</b></div></div>'+
+        '<div class="bk-tot"><span>Total</span><div><b>'+esc(r.total||"—")+'</b></div></div></div></div>';
+      if(!ann){
+        if(tard)h+='<p class="gm-note">'+msgOf({error:"delai",delai:j.delai})+' <a href="https://wa.me/2290148841111?text='+encodeURIComponent(T("Bonjour, au sujet de ma réservation ","Hello, about my booking ")+r.ref)+'" target="_blank" rel="noopener">WhatsApp</a></p>';
+        else h+='<div class="gm-acts"><button type="button" class="btn ghost" data-gm="mod">'+T("Modifier mes dates","Change my dates")+'</button><button type="button" class="btn ghost gm-danger" data-gm="ann">'+T("Annuler ma réservation","Cancel my booking")+'</button></div>'+
+          '<form class="avl-f gm-box" id="gm-mod" hidden novalidate><h3>'+T("Nouvelles dates","New dates")+'</h3><div class="g2"><div class="fld"><label for="gm-a">'+T("Arrivée","Check-in")+'</label><input type="date" id="gm-a" value="'+r.a+'" required></div><div class="fld"><label for="gm-d">'+T("Départ","Check-out")+'</label><input type="date" id="gm-d" value="'+r.d+'" required></div></div><p class="gm-est" id="gm-est"></p><p class="avl-err" id="gm-merr" role="alert"></p><button class="btn" type="submit">'+T("Vérifier et modifier","Check and change")+'</button></form>'+
+          '<div class="gm-box" id="gm-ann" hidden><h3>'+T("Annuler cette réservation ?","Cancel this booking?")+'</h3><p>'+T("L’annulation est gratuite. La chambre sera libérée et vous recevrez un email de confirmation.","Cancellation is free. The room will be released and you will receive a confirmation email.")+'</p><p class="avl-err" id="gm-aerr" role="alert"></p><div class="gm-acts"><button type="button" class="btn gm-danger-fill" data-gm="ann-ok">'+T("Oui, annuler","Yes, cancel")+'</button><button type="button" class="btn ghost" data-gm="ann-no">'+T("Garder ma réservation","Keep my booking")+'</button></div></div>';
+      }
+      h+='<p class="gm-back"><a class="lnk" href="'+(EN?"index-en.html":"index.html")+'">'+T("Retour à l’accueil","Back to home")+'</a></p>';
+      out.innerHTML=h;cur(out);f.hidden=true;$$(".res-help").forEach(function(x){x.hidden=true});
+      var mod=$("#gm-mod",out),an=$("#gm-ann",out);
+      function est(){var a=$("#gm-a").value,d=$("#gm-d").value;$("#gm-est").innerHTML=a&&d&&d>a?nn(nights(a,d))+(priceTot(r,a,d)?' · '+T("nouveau total estimé : ","new estimated total: ")+'<b><span class="px">'+priceTot(r,a,d)+'</span></b>':''):'';cur(mod)}
+      out.onclick=function(e){var b=e.target.closest("[data-gm]");if(!b)return;var k=b.dataset.gm;
+        if(k==="mod"){mod.hidden=!mod.hidden;an.hidden=true;if(!mod.hidden){est();mod.scrollIntoView({behavior:"smooth",block:"center"})}}
+        if(k==="ann"){an.hidden=!an.hidden;mod.hidden=true;if(!an.hidden)an.scrollIntoView({behavior:"smooth",block:"center"})}
+        if(k==="ann-no")an.hidden=true;
+        if(k==="ann-ok"){b.disabled=true;b.textContent=T("Annulation…","Cancelling…");
+          post({action:"annuler",ref:r.ref,email:em}).then(function(x){if(x&&x.ok){render(x,[T("Réservation annulée","Booking cancelled"),T("Votre réservation est annulée sans frais. Un email de confirmation vous a été envoyé. Nous espérons vous accueillir une prochaine fois.","Your booking has been cancelled free of charge. A confirmation email is on its way. We hope to welcome you another time.")]);window.scrollTo({top:0,behavior:"smooth"})}else{b.disabled=false;b.textContent=T("Oui, annuler","Yes, cancel");$("#gm-aerr").textContent=msgOf(x)}},function(){b.disabled=false;b.textContent=T("Oui, annuler","Yes, cancel");$("#gm-aerr").textContent=msgOf({})})}
+      };
+      if(mod){mod.addEventListener("input",est);mod.addEventListener("change",est);
+        mod.addEventListener("submit",function(e){e.preventDefault();var a=$("#gm-a").value,d=$("#gm-d").value,me=$("#gm-merr"),bt=$("button[type=submit]",mod);me.textContent="";
+          if(!a||!d||d<=a){me.textContent=msgOf({error:"dates"});return}
+          if(a===r.a&&d===r.d){me.textContent=T("Ce sont déjà vos dates.","These are already your dates.");return}
+          bt.disabled=true;bt.textContent=T("Vérification…","Checking…");
+          post({action:"modifier",ref:r.ref,email:em,a:a,d:d,total:priceTot(r,a,d)}).then(function(x){if(x&&x.ok){x.tard=false;render(x,[T("Nouvelles dates confirmées","New dates confirmed"),T("Votre réservation est mise à jour et un email de confirmation vous a été envoyé. À très bientôt chez Amazing Grace Luxury !","Your booking has been updated and a confirmation email is on its way. See you soon at Amazing Grace Luxury!")]);window.scrollTo({top:0,behavior:"smooth"})}else{bt.disabled=false;bt.textContent=T("Vérifier et modifier","Check and change");me.textContent=msgOf(x)}},function(){bt.disabled=false;bt.textContent=T("Vérifier et modifier","Check and change");me.textContent=msgOf({})})});}
+    }
+    f.addEventListener("submit",function(e){e.preventDefault();err.textContent="";if(!SHEET)return;if(!validate(f,err))return;
+      em=f.email.value.trim();var go=$("#gm-go"),lbl=go.textContent;go.disabled=true;go.textContent=T("Recherche…","Searching…");
+      post({action:"consulter",ref:f.ref.value.trim().toUpperCase(),email:em}).then(function(j){go.disabled=false;go.textContent=lbl;if(j&&j.ok)render(j);else err.textContent=msgOf(j)},function(){go.disabled=false;go.textContent=lbl;err.textContent=msgOf({})});
+    });
+  }
+  function start(){results();resvPage();roomPage();optPage();coordPage();gererPage()}
   function noDb(){if(A.api){SHEET=A.api;api.ready=true}start()}
   if(!window.claude||!window.claude.use){noDb();return}
   Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(x){

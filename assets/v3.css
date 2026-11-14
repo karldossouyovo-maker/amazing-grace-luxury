@@ -1203,3 +1203,19 @@ body.has-rbar .wa-f{bottom:calc(max(18px,env(safe-area-inset-bottom,0px)) + 78px
 .bk-info b{display:block;font:400 .95rem/1.4 var(--body);color:var(--ink)}
 .bk-info b a{color:inherit}
 .bk-info div>a{font-size:.85rem;color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+
+/* ===== Gérer ma réservation ===== */
+.gm{max-width:760px;margin:0 auto;display:grid;gap:18px}
+.gm-f{margin-top:6px}
+#gm-res{display:grid;gap:18px}
+.gm-off{color:#7a7a7a!important;background:#f1f0ee!important;border-color:#e2e0dc!important}
+.gm-hd-off{background:#f6f5f2;border-color:#e6e3dc}.gm-hd-off .ok{background:#6c6c6c}.gm-hd-off p{color:var(--muted)}
+.gm-acts{display:flex;flex-wrap:wrap;gap:12px}
+.gm-danger{color:#a3352c!important;border-color:#e8c7c3!important}
+.gm-danger-fill{background:#a3352c!important;border-color:#a3352c!important;color:#fff!important}
+.gm-box{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px 24px;display:grid;gap:14px}
+.gm-box[hidden]{display:none!important}
+.gm-box h3{font-size:1.4rem;margin:0}
+.gm-est{color:var(--ink);margin:0}
+.gm-note{background:#fbf6ea;border:1px solid #ecdcb4;border-radius:14px;padding:14px 16px;color:var(--ink)}
+.gm-back{text-align:center}
