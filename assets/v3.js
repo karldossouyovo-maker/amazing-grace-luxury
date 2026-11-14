@@ -397,6 +397,18 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
   });
 })();
 
+/* Fiche chambre : barre « Réserver » sur téléphone quand le formulaire n'est pas visible */
+(function(){
+  var bar=document.getElementById("rbar"),f=document.getElementById("rbook");if(!bar||!f||!("IntersectionObserver" in window))return;
+  bar.hidden=false;var past=false,vis=false;
+  function upd(){var on=past&&!vis&&window.innerWidth<1000;bar.classList.toggle("on",on);document.body.classList.toggle("has-rbar",on)}
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;upd()},{threshold:.15}).observe(f);
+  var hd=document.querySelector(".rhead");
+  if(hd)new IntersectionObserver(function(e){past=!e[0].isIntersecting;upd()}).observe(hd);else past=true;
+  window.addEventListener("resize",upd);
+  bar.querySelector("a").addEventListener("click",function(e){e.preventDefault();f.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){var d=document.getElementById("rb-in");if(d&&!d.value)try{d.focus({preventScroll:true})}catch(x){}},500)});
+})();
+
 /* ── Réservation instantanée : page « Chambres disponibles » + page Réserver ── */
 (function(){
   var $=function(s,c){return (c||document).querySelector(s)}, $$=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
@@ -497,21 +509,34 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     return fetch("https://formsubmit.co/ajax/"+(A.mail||"liroykd@gmail.com"),{method:"POST",body:b,headers:{Accept:"application/json"}}).then(function(r){if(!r.ok)throw {};return it});
   };
   api.done=function(box,it){
-    if(it.st==="demande"){
-      box.innerHTML='<div class="avl-done"><span class="ok">✓</span><h2>'+T("Demande de réservation envoyée","Booking request sent")+'</h2><p class="refn">'+T("Référence :","Reference:")+' <b>'+it.ref+'</b></p>'+
-      '<p>'+it.rooms.map(function(id){return esc(byId[id].n)}).concat((it.cats||[]).map(function(c){return T("Une chambre ","Any ")+esc(c.toLowerCase())})).join(" + ")+' · '+fdate(it.a)+' → '+fdate(it.d)+' · '+nn(it.nuits)+'</p>'+
-      (it.total!=null?'<p class="tot"><span class="px">'+fc(it.total)+'</span> <small>'+T("estimation, petit-déjeuner inclus","estimate, breakfast included")+'</small></p>':'')+
-      '<p class="avl-note">'+T("La réception vérifie la disponibilité et vous confirme votre réservation très vite, sur WhatsApp ou par email.","Reception checks availability and confirms your booking very soon, on WhatsApp or by email.")+'</p>'+
-      '<p style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn" target="_blank" rel="noopener" href="https://wa.me/2290148841111?text='+encodeURIComponent(T("Bonjour, je viens d’envoyer une demande de réservation. Référence : ","Hello, I have just sent a booking request. Reference: ")+it.ref)+'">'+T("Écrire à la réception","Message reception")+'</a><a class="btn ghost" href="'+(EN?"index-en.html":"index.html")+'">'+T("Retour à l’accueil","Back to home")+'</a></p></div>';
-      cur(box);box.scrollIntoView({block:"start"});return}
-    var dv=it.st==="devis";
-    box.innerHTML='<div class="avl-done"><span class="ok">✓</span><h2>'+(dv?T("Demande de devis envoyée","Quote request sent"):T("Votre réservation est confirmée","Your booking is confirmed"))+'</h2><p class="refn">'+T("Référence :","Reference:")+' <b>'+it.ref+'</b></p>'+
-      '<p>'+it.rooms.map(function(id){return esc(byId[id].n)}).join(" + ")+' · '+fdate(it.a)+' → '+fdate(it.d)+' · '+nn(it.nuits)+'</p>'+
-      (dv?'':'<p class="tot"><span class="px">'+fc(it.total)+'</span> <small>'+T("petit-déjeuner inclus · à régler à la réception","breakfast included · paid at reception")+'</small></p>')+
-      (it.options&&it.options.length?'<p class="avl-note">'+esc(it.options.join(" · "))+'</p>':'')+
-      '<p class="avl-note">'+(dv?T("Notre équipe évalue le tarif de votre séjour et vous adresse un devis sur WhatsApp ou par email.","Our team will price your stay and send you a quote on WhatsApp or by email."):T("Votre chambre vous attend. La réception vous contacte sur WhatsApp ou par email pour préparer votre arrivée.","Your room is waiting for you. Reception will contact you on WhatsApp or by email to prepare your arrival."))+'</p>'+
-      '<p style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><a class="btn" target="_blank" rel="noopener" href="https://wa.me/2290148841111?text='+encodeURIComponent(T("Bonjour, je viens de réserver sur le site. Référence : ","Hello, I have just booked on the website. Reference: ")+it.ref)+'">'+T("Écrire à la réception","Message reception")+'</a><a class="btn ghost" href="'+(EN?"index-en.html":"index.html")+'">'+T("Retour à l’accueil","Back to home")+'</a></p></div>';
-    cur(box);box.scrollIntoView({block:"start"});
+    var dv=it.st==="devis",dem=it.st==="demande",n=it.nuits||nights(it.a,it.d);
+    var first=byId[(it.rooms||[])[0]]||R.filter(function(x){return (it.cats||[])[0]===x.cat})[0];
+    var names=(it.rooms||[]).map(function(id){return esc(byId[id].n)}).concat((it.cats||[]).map(function(c){return T("Sans préférence · ","No preference · ")+esc(c)})).join(" + ");
+    var pre=String(it.nom||"").trim().split(/\s+/)[0];
+    var title=dv?T("Demande de devis envoyée","Quote request sent"):dem?T("Demande de réservation envoyée","Booking request sent"):T("Votre réservation est confirmée","Your booking is confirmed");
+    var lead=(pre?T("Merci ","Thank you ")+esc(pre)+" ! ":T("Merci ! ","Thank you! "))+(dv?T("Notre équipe évalue le tarif de votre séjour.","Our team is pricing your stay."):dem?T("Votre demande est bien arrivée à la réception.","Your request has reached reception."):T("Votre chambre vous attend.","Your room is waiting for you."));
+    function day(d){var p=d.split("-"),dt=new Date(+p[0],+p[1]-1,+p[2]);return '<b>'+dt.toLocaleDateString(EN?"en-GB":"fr-FR",{weekday:"short",day:"numeric",month:"short",year:"numeric"})+'</b>'}
+    var opts=(it.options||[]).length?esc(it.options.join(" · ")):"—";
+    var img=first&&(first.img||first.th)?'<img src="assets/img/'+(first.img||first.th)+'" alt="">':'';
+    var tot=dv?'<b>'+T("Sur devis","On quote")+'</b>':(it.total!=null?'<b><span class="px">'+fc(it.total)+'</span></b><small>'+(dem?T("Estimation · petit-déjeuner compris","Estimate · breakfast included"):T("Petit-déjeuner compris","Breakfast included"))+'</small>':'<b>'+T("Sur demande","On request")+'</b>');
+    var steps=dv?[T("Notre équipe étudie votre séjour","Our team reviews your stay"),T("Vous recevez votre devis sur WhatsApp ou par email","You receive your quote on WhatsApp or by email"),T("Vous validez, et nous préparons votre arrivée","You confirm, and we prepare your arrival")]
+      :dem?[T("La réception vérifie la disponibilité et vous confirme très vite","Reception checks availability and confirms very soon"),T("Vous recevez la confirmation et les informations pratiques sur WhatsApp ou par email","You receive confirmation and practical details on WhatsApp or by email"),T("Nous vous accueillons à Cotonou, petit-déjeuner compris","We welcome you in Cotonou, breakfast included")]
+      :[T("Votre chambre est bloquée à vos dates","Your room is held for your dates"),T("La réception vous contacte pour préparer votre arrivée","Reception contacts you to prepare your arrival"),T("Vous réglez sur place, en toute simplicité","You pay on site, simply")];
+    var wa='https://wa.me/2290148841111?text='+encodeURIComponent(T("Bonjour, je viens de faire une demande sur le site. Référence : ","Hello, I have just made a request on the website. Reference: ")+it.ref);
+    box.classList.add("bk-done-wrap");
+    box.innerHTML='<div class="bk-done">'+
+      '<div class="bk-hd"><span class="ok" aria-hidden="true">✓</span><div><h2>'+title+'</h2><p>'+lead+(it.email?' '+T("Un récapitulatif part à ","A summary is on its way to ")+'<b>'+esc(it.email)+'</b>.':'')+'</p></div></div>'+
+      '<div class="bk-card">'+(img?'<div class="bk-img">'+img+'</div>':'')+
+        '<div class="bk-b"><div class="bk-ref"><span>'+T("Référence","Reference")+'</span><b>'+esc(it.ref)+'</b></div>'+
+        '<h3>'+names+'</h3>'+
+        '<div class="bk-dates"><div><span>'+T("Arrivée","Check-in")+'</span>'+day(it.a)+'</div><i aria-hidden="true">→</i><div><span>'+T("Départ","Check-out")+'</span>'+day(it.d)+'</div></div>'+
+        '<div class="bk-rows"><div><span>'+T("Durée","Length")+'</span><b>'+nn(n)+'</b></div><div><span>'+T("Voyageurs","Guests")+'</span><b>'+(it.adultes||it.ad||2)+' '+T("adulte(s)","adult(s)")+((it.enfants||it.en)?' · '+(it.enfants||it.en)+' '+T("enfant(s)","child(ren)"):'')+'</b></div><div class="w"><span>Options</span><b>'+opts+'</b></div></div>'+
+        '<div class="bk-tot"><span>Total</span><div>'+tot+'</div></div></div></div>'+
+      '<div class="bk-next"><h3>'+T("Et maintenant ?","What happens next?")+'</h3><ol>'+steps.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ol></div>'+
+      '<div class="bk-acts"><a class="btn" target="_blank" rel="noopener" href="'+wa+'">'+T("Écrire à la réception","Message reception")+'</a><button type="button" class="btn ghost" onclick="window.print()">'+T("Imprimer / enregistrer","Print / save")+'</button><a class="lnk" href="'+(EN?"index-en.html":"index.html")+'">'+T("Retour à l’accueil","Back to home")+'</a></div>'+
+    '</div>';
+    var sec=box.closest("section");if(sec)$$(".kick,h1,.res-help",sec).forEach(function(x){if(!box.contains(x))x.hidden=true});
+    cur(box);window.scrollTo({top:0,behavior:"smooth"});
   };
   function errMsg(e){return e&&e.taken?T("Désolé, ","Sorry, ")+e.taken+T(" n’est plus libre à ces dates. Choisissez une autre chambre."," is no longer available for these dates. Please choose another room."):T("La réservation n’a pas pu être enregistrée. Réessayez ou écrivez-nous sur WhatsApp.","The booking could not be saved. Try again or message us on WhatsApp.")}
   function readOpts(f){
@@ -609,32 +634,41 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
 
   /* ===== fiche chambre : étape de confirmation ===== */
   function roomPage(){
-    var f=$("#rbook"),sec=$("#confirmer"),cf=$("#cf-f");if(!f||!sec||!cf)return;
-    var id=f.chambre.value,r=byId[id],st=null,msg=$("#rb-msg");
+    var f=$("#rbook");if(!f||!f.chambre)return;
+    var id=f.chambre.value,msg=$("#rb-msg");
+    f.addEventListener("submit",function(e){e.preventDefault();msg.textContent="";
+      var a=f.arrivee.value,d=f.depart.value;if(!a||!d||d<=a){msg.textContent=T("Choisissez vos dates d’arrivée et de départ.","Choose your check-in and check-out dates.");return}
+      var st={room:id,a:a,d:d,ad:+f.adultes.value||2,en:+f.enfants.value||0,back:location.pathname.split("/").pop()};
+      var go=$("button[type=submit]",f),lbl=go.textContent;
+      function next(){try{sessionStorage.setItem("agr-opt",JSON.stringify(st))}catch(x){}location.href=(A.opt||"options.html")+"?s="+encodeURIComponent(JSON.stringify(st))}
+      if(!api.ready){next();return}
+      go.disabled=true;go.textContent=T("Vérification…","Checking…");
+      fetchDispo().then(function(m){go.disabled=false;go.textContent=lbl;
+        if(freeFor(m,id,a,d)){next();return}
+        msg.innerHTML=T("Cette chambre est indisponible à ces dates. ","This room is unavailable for these dates. ")+'<a href="'+A.avail+'?arrivee='+a+'&depart='+d+'&adultes='+st.ad+'&enfants='+st.en+'">'+T("Voir les autres chambres libres","See other available rooms")+'</a>';
+      },function(){go.disabled=false;go.textContent=lbl;next()});
+    });
+  }
+  /* ===== page « Vos options » (étape 2) ===== */
+  function optPage(){
+    var cf=$("#cf-f"),sec=$("#confirmer");if(!cf||!sec||$("#rbook"))return;
+    var st=null;try{st=JSON.parse(new URLSearchParams(location.search).get("s")||"null")}catch(e){}
+    if(!st){try{st=JSON.parse(sessionStorage.getItem("agr-opt")||"null")}catch(e){}}
+    var r=st&&byId[st.room];
+    if(!r||!st.a||!st.d){$("#cf-wrap").innerHTML='<p class="avl-none">'+T("Aucune chambre sélectionnée. ","No room selected. ")+'<a href="'+(EN?"chambres-en.html":"chambres.html")+'">'+T("Choisir une chambre","Choose a room")+'</a></p>';return}
+    var im=$("#cf-img");if(r.th||r.img){im.src="assets/img/"+(r.img||r.th);im.hidden=false}
+    $("#cf-cat").textContent=r.cat;$("#cf-name").textContent=r.n;
+    var ed=$("#cf-edit");ed.href=(st.back||r.url)+"#rbook";ed.textContent=T("Modifier la chambre ou les dates","Change room or dates");
     function opts(){return readOpts(cf)}
-    function recap(){if(!st)return;var n=nights(st.a,st.d),LG=n>30;
+    function recap(){var n=nights(st.a,st.d),LG=n>30;
       $("#cf-dates").textContent=fdate(st.a)+" → "+fdate(st.d);$("#cf-n").textContent=nn(n);
       $("#cf-g").textContent=st.ad+" "+T(st.ad>1?"adultes":"adulte",st.ad>1?"adults":"adult")+(st.en?" · "+st.en+" "+T(st.en>1?"enfants":"enfant",st.en>1?"children":"child"):"");
       $("#cf-rate").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p)+'</span>':T("Sur demande","On request"));
       var o=opts(),lt=isLate(o)&&r.p!=null?Math.round(r.p/2):0;
       $("#cf-tot").innerHTML=LG?T("Sur devis","On quote"):(r.p!=null?'<span class="px">'+fc(r.p*n+lt)+'</span>':T("Confirmé par la réception","Confirmed by reception"));$("#cf-opts").textContent=o.length?o.join(" · "):"—";
-      $("#cf-go").textContent=LG?T("Envoyer ma demande de devis","Send my quote request"):(api.ready?T("Confirmer ma réservation","Confirm my booking"):T("Je réserve dès maintenant","Book now"));
       cur(sec)}
-    cf.addEventListener("change",recap);cf.addEventListener("input",recap);
-    $("#cf-edit").onclick=function(e){e.preventDefault();f.scrollIntoView({behavior:"smooth",block:"center"})};
-    f.addEventListener("submit",function(e){e.preventDefault();msg.textContent="";
-      var a=f.arrivee.value,d=f.depart.value;if(!a||!d||d<=a){msg.textContent=T("Choisissez vos dates d’arrivée et de départ.","Choose your check-in and check-out dates.");return}
-      st={a:a,d:d,ad:+f.adultes.value||2,en:+f.enfants.value||0};
-      var go=$("button[type=submit]",f),lbl=go.textContent;
-      function show(){sec.hidden=false;recap();setTimeout(function(){sec.scrollIntoView({behavior:"smooth",block:"start"})},50)}
-      if(!api.ready){show();return}
-      go.disabled=true;go.textContent=T("Vérification…","Checking…");
-      fetchDispo().then(function(m){go.disabled=false;go.textContent=lbl;
-        if(freeFor(m,id,a,d)){show();return}
-        sec.hidden=true;msg.innerHTML=T("Cette chambre est indisponible à ces dates. ","This room is unavailable for these dates. ")+'<a href="'+A.avail+'?arrivee='+a+'&depart='+d+'&adultes='+st.ad+'&enfants='+st.en+'">'+T("Voir les autres chambres libres","See other available rooms")+'</a>';
-      },function(){go.disabled=false;go.textContent=lbl;show()});
-    });
-    cf.addEventListener("submit",function(e){e.preventDefault();if(!st)return;goContact({picks:[{room:id}],a:st.a,d:st.d,ad:st.ad,en:st.en,options:opts()})});
+    cf.addEventListener("change",recap);cf.addEventListener("input",recap);recap();
+    cf.addEventListener("submit",function(e){e.preventDefault();goContact({picks:[{room:st.room}],a:st.a,d:st.d,ad:st.ad,en:st.en,options:opts()})});
   }
   /* ===== page « Vos coordonnées » ===== */
   function coordPage(){
@@ -662,7 +696,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       (api.ready?api.book:api.request)({picks:st.picks,a:st.a,d:st.d,ad:st.ad,en:st.en,options:st.options,who:{nom:nom,tel:f.tel.value.trim(),email:f.email.value.trim(),msg:msg}})
         .then(function(it){try{sessionStorage.removeItem("agr-sel")}catch(e){}api.done($("#co-wrap"),it)},function(e2){go.disabled=false;go.textContent=lbl;err.innerHTML=errMsg(e2)+(e2&&e2.taken?' <a href="'+A.avail+'?arrivee='+st.a+'&depart='+st.d+'">'+T("Voir les chambres libres","See available rooms")+'</a>':'')})});
   }
-  function start(){results();resvPage();roomPage();coordPage()}
+  function start(){results();resvPage();roomPage();optPage();coordPage()}
   function noDb(){if(A.api){SHEET=A.api;api.ready=true}start()}
   if(!window.claude||!window.claude.use){noDb();return}
   Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(x){
