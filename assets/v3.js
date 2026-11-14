@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     function price(r,from){return r&&r.p!=null?'<span class="px">'+(from?T("dès ","from "):"")+fc(r.p)+'</span>':'<span>'+T("Sur demande","On request")+'</span>'}
     function render(){
       var v=sel.value,r=byId[v],c=v.indexOf("cat:")===0?v.slice(4):null;
-      if(r)btn.innerHTML='<span class="rp-th">'+thumb(r)+'</span><span class="rp-t"><b>'+esc2(r.n)+'</b><small>'+esc2(r.cat)+' · '+price(r)+T(" / nuit"," / night")+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>';
+      if(r)btn.innerHTML='<span class="rp-th">'+thumb(r)+'</span><span class="rp-t"><b>'+esc2(r.n)+'</b><small>'+esc2(r.cat)+'</small><small class="rp-pr">'+price(r)+T(" / nuit"," / night")+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>';
       else if(c){var cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(a,b){return a.p-b.p})[0];btn.innerHTML='<span class="rp-th">'+thumb(cr)+'</span><span class="rp-t"><b>'+T("Une chambre ","Any ")+esc2(c.toLowerCase())+'</b><small>'+T("La plus belle libre · ","Best available · ")+price(cr,1)+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>'}
       else btn.innerHTML='<span class="rp-t rp-ph">'+T("Choisir une chambre","Choose a room")+'</span><span class="rp-ch">'+T("Voir les chambres","See the rooms")+'</span>';
       if(window.AGRcur)window.AGRcur.apply(btn);
