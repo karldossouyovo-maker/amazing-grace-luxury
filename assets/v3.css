@@ -1122,3 +1122,4 @@ html.rp-lock{overflow:hidden}
 .rp-sea{font:500 .62rem/1 var(--body);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:#2b6f86;background:#e3f1f5;border-radius:999px;padding:4px 7px;vertical-align:middle;margin-left:4px}
 .rp-any{background:#fbf8f1}
 .rp-btn .rp-pr{color:var(--ink);font-weight:400}
+.rp-star{color:var(--gold);font-size:1.3rem;background:#fbf3df}

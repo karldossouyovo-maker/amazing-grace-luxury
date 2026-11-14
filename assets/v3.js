@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
     function render(){
       var v=sel.value,r=byId[v],c=v.indexOf("cat:")===0?v.slice(4):null;
       if(r)btn.innerHTML='<span class="rp-th">'+thumb(r)+'</span><span class="rp-t"><b>'+esc2(r.n)+'</b><small>'+esc2(r.cat)+'</small><small class="rp-pr">'+price(r)+T(" / nuit"," / night")+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>';
-      else if(c){var cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(a,b){return a.p-b.p})[0];btn.innerHTML='<span class="rp-th">'+thumb(cr)+'</span><span class="rp-t"><b>'+T("Une chambre ","Any ")+esc2(c.toLowerCase())+'</b><small>'+T("La plus belle libre · ","Best available · ")+price(cr,1)+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>'}
+      else if(c){var cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(a,b){return a.p-b.p})[0];btn.innerHTML='<span class="rp-th">'+thumb(cr)+'</span><span class="rp-t"><b>'+T("Sans préférence","No preference")+'</b><small>'+esc2(c)+' · '+T("la plus belle libre · ","best available · ")+price(cr,1)+'</small></span><span class="rp-ch">'+T("Changer","Change")+'</span>'}
       else btn.innerHTML='<span class="rp-t rp-ph">'+T("Choisir une chambre","Choose a room")+'</span><span class="rp-ch">'+T("Voir les chambres","See the rooms")+'</span>';
       if(window.AGRcur)window.AGRcur.apply(btn);
     }
@@ -300,7 +300,11 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         h+='<p class="rp-cat">'+esc2(c)+'</p>';
         rooms.filter(function(o){return byId[o.value].cat===c}).forEach(function(o){var r=byId[o.value];
           h+='<button type="button" class="rp-it" data-v="'+esc2(o.value)+'"><span class="rp-th">'+thumb(r)+'</span><span class="rp-t"><b>'+esc2(r.n)+(r.sea?' <em class="rp-sea">'+T("Vue mer","Sea view")+'</em>':'')+'</b><small>'+esc2(r.at||"")+'</small></span><span class="rp-p">'+price(r)+'<small>'+T("/ nuit","/ night")+'</small></span></button>'});
+        var co=catOpts.filter(function(o){return o.value.slice(4)===c})[0];
+        if(co){var cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(x,y){return x.p-y.p})[0];
+          h+='<button type="button" class="rp-it rp-any" data-v="'+esc2(co.value)+'"><span class="rp-th rp-star">✦</span><span class="rp-t"><b>'+T("Sans préférence","No preference")+'</b><small>'+T("Nous vous attribuons la plus belle ","We give you the finest ")+esc2(c.toLowerCase())+T(" libre"," available")+'</small></span><span class="rp-p">'+price(cr,1)+'</span></button>'}
       });
+      catOpts=catOpts.filter(function(o){return cats.indexOf(o.value.slice(4))<0});
       if(catOpts.length){h+='<p class="rp-cat">'+T("Ou laissez-nous choisir","Or let us choose")+'</p>';
         catOpts.forEach(function(o){var c=o.value.slice(4),cr=R.filter(function(x){return x.cat===c&&x.p!=null}).sort(function(a,b){return a.p-b.p})[0];
           h+='<button type="button" class="rp-it rp-any" data-v="'+esc2(o.value)+'"><span class="rp-th">'+thumb(cr)+'</span><span class="rp-t"><b>'+T("Une chambre ","Any ")+esc2(c.toLowerCase())+'</b><small>'+T("Nous vous attribuons la plus belle libre","We give you the finest one available")+'</small></span><span class="rp-p">'+price(cr,1)+'</span></button>'})}
@@ -549,14 +553,14 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
         if(free.length)anyFree=true;
         var title=cat==="__sweet"?T("Pour les familles","For families"):cat;
         h+='<section class="rg-cat"><div class="rg-h"><h2>'+esc(title)+'</h2><span>'+(OFF?rooms.length+" "+T(rooms.length>1?"chambres":"chambre",rooms.length>1?"rooms":"room"):(free.length?free.length+" "+T(free.length>1?"chambres libres":"chambre libre",free.length>1?"rooms available":"room available"):T("Complet à ces dates","Fully booked for these dates")))+'</span></div><div class="avl-list">';
-        if(bookable.length>1&&cat!=="__sweet"){var mn=Math.min.apply(null,bookable.map(function(r){return r.p||0}));
-          h+='<label class="avl-r anycat"><span class="ph">✦</span><span class="t"><span class="c">'+T("Peu importe la chambre","Any room")+'</span><span class="n">'+T("Une chambre ","Any ")+esc(cat.toLowerCase())+T(" libre",""+" available")+'</span><span class="s">'+T("Nous vous attribuons la meilleure chambre libre de cette catégorie.","We assign you the best available room in this category.")+'</span></span><span class="p">'+(LG?'<b>'+T("Sur devis","On quote")+'</b>':'<b>'+T("dès ","from ")+'<span class="px">'+fc(mn*n)+'</span></b><small><span class="px">'+fc(mn)+'</span> × '+nn(n)+'</small>')+'</span><input type="checkbox" data-cat="'+esc(cat)+'"><span class="ck" aria-hidden="true"></span></label>'}
+        var anyH='';if(bookable.length>1&&cat!=="__sweet"){var mn=Math.min.apply(null,bookable.map(function(r){return r.p||0}));
+          anyH+='<label class="avl-r anycat"><span class="ph">✦</span><span class="t"><span class="c">'+T("Sans préférence","No preference")+'</span><span class="n">'+T("Une chambre ","Any ")+esc(cat.toLowerCase())+T(" libre",""+" available")+'</span><span class="s">'+T("Nous vous attribuons la meilleure chambre libre de cette catégorie.","We assign you the best available room in this category.")+'</span></span><span class="p">'+(LG?'<b>'+T("Sur devis","On quote")+'</b>':'<b>'+T("dès ","from ")+'<span class="px">'+fc(mn*n)+'</span></b><small><span class="px">'+fc(mn)+'</span> × '+nn(n)+'</small>')+'</span><input type="checkbox" data-cat="'+esc(cat)+'"><span class="ck" aria-hidden="true"></span></label>'}
         rooms.forEach(function(r){var ok=freeFor(m,r.id,st.a,st.d),bk=ok&&(r.p!=null||LG);
           var tot=LG?'<b>'+T("Sur devis","On quote")+'</b>':r.p!=null?'<b><span class="px">'+fc(r.p*n)+'</span></b><small><span class="px">'+fc(r.p)+'</span> × '+nn(n)+'</small>':'<b>'+T("Sur demande","On request")+'</b>';
           h+='<label class="avl-r'+(ok?"":" off")+'" style="--pbg:'+r.pbg+';--ac:'+r.ac+'">'+(r.img?'<img src="assets/img/'+r.img+'" alt="" loading="lazy">':'<span class="ph"></span>')+
           '<span class="t"><span class="c">'+esc(r.cat)+'</span><span class="n"><a href="'+r.url+'" target="_blank" rel="noopener">'+esc(r.n)+'</a>'+(r.sea?' <span class="seab">'+T("Face à la mer","Facing the sea")+'</span>':'')+'</span><span class="s">'+(ok?(bk?(OFF?T("Disponibilité confirmée par la réception","Availability confirmed by reception"):'✓ '+T("Libre à ces dates","Available for these dates")):T("Libre · tarif sur demande","Available · rate on request")):T("Indisponible à ces dates","Unavailable for these dates"))+'</span></span>'+
           '<span class="p">'+(ok?tot:'')+'</span>'+(bk?'<input type="checkbox" data-room="'+r.id+'"'+(st.room===r.id?" checked":"")+'><span class="ck" aria-hidden="true"></span>':(ok&&r.p==null?'<a class="lnk" href="'+A.resv+'?chambre='+r.id+'&arrivee='+st.a+'&depart='+st.d+'">'+T("Demander","Ask")+'</a>':'<span></span>'))+'</label>'});
-        h+='</div></section>';
+        h+=anyH+'</div></section>';
       });
       if(!anyFree)h='<p class="avl-none">'+T("Aucune chambre n’est libre à ces dates. Essayez d’autres dates ou écrivez-nous sur WhatsApp.","No room is available for these dates. Try other dates or message us on WhatsApp.")+'</p>'+h;
       list.innerHTML=h;cur(list);
