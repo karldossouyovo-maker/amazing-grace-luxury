@@ -354,7 +354,7 @@ document.addEventListener("DOMContentLoaded",top);window.addEventListener("load"
       var v=+sp.dataset.v;
       if(code==="XOF"){sp.textContent=sp.dataset.o;sp.removeAttribute("title");return}
       var x=v/RATES[code];
-      sp.textContent="≈ "+new Intl.NumberFormat(EN?"en-GB":"fr-FR",{style:"currency",currency:code,maximumFractionDigits:0}).format(x);
+      sp.textContent=new Intl.NumberFormat(EN?"en-GB":"fr-FR",{style:"currency",currency:code,minimumFractionDigits:2,maximumFractionDigits:2}).format(x);
       sp.title=sp.dataset.o+(EN?" · indicative rate":" · taux indicatif");
     });
     document.documentElement.classList.toggle("cur-x",code!=="XOF");
