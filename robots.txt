@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /reception.html
+
+Sitemap: https://karldossouyovo-maker.github.io/amazing-grace-luxury/sitemap.xml
